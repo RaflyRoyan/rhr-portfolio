@@ -1,0 +1,23 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ProjectCard from '../../components/ProjectCard.astro';
+import EmptyState from '../../components/EmptyState.astro';
+import { getProjects } from '../../lib/collections';
+
+const projects = await getProjects();
+---
+
+<BaseLayout title="Projects" description="Daftar project.">
+  <h1 class="mb-8 text-3xl font-bold tracking-tight">Projects</h1>
+  {
+    projects.length > 0 ? (
+      <div class="grid gap-4">
+        {projects.map((project) => (
+          <ProjectCard project={project} />
+        ))}
+      </div>
+    ) : (
+      <EmptyState message="Belum ada project." />
+    )
+  }
+</BaseLayout>

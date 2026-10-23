@@ -1,0 +1,51 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SectionHeading from '../components/SectionHeading.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+import UpdateItem from '../components/UpdateItem.astro';
+import EmptyState from '../components/EmptyState.astro';
+import { getProjects, getUpdates } from '../lib/collections';
+import { SITE } from '../consts';
+
+const projects = await getProjects();
+const featuredOnly = projects.filter((p) => p.data.featured);
+const featured = (featuredOnly.length > 0 ? featuredOnly : projects).slice(0, 4);
+const updates = (await getUpdates()).slice(0, 5);
+---
+
+<BaseLayout>
+  <section class="mb-16">
+    <h1 class="text-3xl font-bold tracking-tight sm:text-4xl">{SITE.title}</h1>
+    <p class="mt-4 text-zinc-600 dark:text-zinc-400">{SITE.description}</p>
+  </section>
+
+  <section class="mb-16">
+    <SectionHeading title="Projects" href="/projects" />
+    {
+      featured.length > 0 ? (
+        <div class="grid gap-4">
+          {featured.map((project) => (
+            <ProjectCard project={project} />
+          ))}
+        </div>
+      ) : (
+        <EmptyState message="Belum ada project." />
+      )
+    }
+  </section>
+
+  <section>
+    <SectionHeading title="Updates" />
+    {
+      updates.length > 0 ? (
+        <ul class="space-y-6">
+          {updates.map((update) => (
+            <UpdateItem update={update} />
+          ))}
+        </ul>
+      ) : (
+        <EmptyState message="Belum ada update." />
+      )
+    }
+  </section>
+</BaseLayout>

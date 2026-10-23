@@ -1,0 +1,13 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  # Astro 7 butuh Node >= 22.23.4; "22" = rilis 22.x terbaru di Netlify
+  NODE_VERSION = "22"
+
+# Aset hasil build Astro ber-hash, aman di-cache selamanya
+[[headers]]
+  for = "/_astro/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"

@@ -1,0 +1,18 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import FormattedDate from './FormattedDate.astro';
+
+interface Props {
+  update: CollectionEntry<'updates'>;
+}
+
+const { title, date, summary } = Astro.props.update.data;
+---
+
+<li class="flex gap-4">
+  <FormattedDate date={date} class="w-24 shrink-0 font-mono text-xs leading-6 text-zinc-500" />
+  <div>
+    <p class="font-medium">{title}</p>
+    {summary && <p class="mt-1 text-sm text-zinc-600 dark:text-zinc-400">{summary}</p>}
+  </div>
+</li>
