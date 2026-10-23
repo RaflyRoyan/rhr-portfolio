@@ -1,16 +1,16 @@
 import { getCollection } from 'astro:content';
 
-const byDateDesc = (a: { data: { date: Date } }, b: { data: { date: Date } }) =>
-  b.data.date.valueOf() - a.data.date.valueOf();
-
-/** Project terbaru dulu; draft hanya tampil saat dev. */
+/** Project urut berdasarkan `order` (kecil dulu). */
 export async function getProjects() {
-  const entries = await getCollection('projects', ({ data }) => import.meta.env.DEV || !data.draft);
-  return entries.sort(byDateDesc);
+  const entries = await getCollection('projects');
+  return entries.sort((a, b) => a.data.order - b.data.order);
 }
 
-/** Update terbaru dulu; draft hanya tampil saat dev. */
+/** Update terbaru dulu; tanggal sama diurutkan dari prefix nomor file terbesar. */
 export async function getUpdates() {
-  const entries = await getCollection('updates', ({ data }) => import.meta.env.DEV || !data.draft);
-  return entries.sort(byDateDesc);
+  const entries = await getCollection('updates');
+  return entries.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf() || b.id.localeCompare(a.id));
 }
+
+/** Slug kategori untuk query URL, mis. "Field Ops" → "field-ops". */
+export const categorySlug = (category: string) => category.toLowerCase().replace(/\s+/g, '-');
