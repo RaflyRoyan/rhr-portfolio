@@ -1,0 +1,154 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import SectionHeading from '../SectionHeading.astro';
+import { profile } from '../../data/profile';
+
+interface Props {
+  projects: CollectionEntry<'projects'>[];
+}
+
+const { projects } = Astro.props;
+
+// Nama skill di profil kadang beda dengan nama tech di project; alias menyamakan keduanya.
+const ALIASES: Record<string, string[]> = {
+  'oracle sql': ['oracle'],
+  'pl/sql': ['pl/sql'],
+  'entity framework core': ['ef core'],
+  'asp.net core mvc/razor': ['asp.net core mvc', 'razor'],
+  'background services': ['background services'],
+  'payment / qris / va': ['va / qris'],
+  'sse (server-sent events)': ['sse'],
+  'materialized view': ['materialized view'],
+  'query optimization': [],
+};
+const norm = (s: string) => s.toLowerCase().trim();
+
+function projectsUsing(skill: string) {
+  const key = norm(skill);
+  const needles = ALIASES[key] ?? [key];
+  return projects
+    .filter((p) => p.data.tech.some((t) => needles.some((n) => norm(t) === n || norm(t).startsWith(`${n} `) || norm(t).endsWith(` ${n}`))))
+    .map((p) => p.id);
+}
+
+const groups = Object.entries(profile.skills).map(([group, skills]) => ({
+  group,
+  skills: skills.map((name) => ({ name, projects: projectsUsing(name) })),
+}));
+---
+
+<section id="stack" class="border-t border-line py-20 sm:py-28">
+  <div class="mx-auto w-full max-w-6xl px-4 sm:px-6">
+    <SectionHeading title="Teknologi" note="Pilih teknologi untuk melihat project yang memakainya." />
+
+    <div class="grid gap-10 lg:grid-cols-[1.4fr_1fr] lg:gap-16" data-stack>
+      <div class="space-y-7">
+        {
+          groups.map(({ group, skills }) => (
+            <div data-reveal>
+              <h3 class="font-mono text-xs text-muted">{group}</h3>
+              <ul class="mt-3 flex flex-wrap gap-2">
+                {skills.map(({ name, projects: used }) => (
+                  <li>
+                    <button
+                      type="button"
+                      aria-pressed="false"
+                      data-tech={name}
+                      data-tech-projects={used.join(' ')}
+                      class="rounded-md border border-line bg-surface px-2.5 py-1.5 font-mono text-xs transition-colors hover:border-muted aria-pressed:border-accent aria-pressed:text-accent sm:text-sm"
+                    >
+                      {name}
+                      {used.length > 0 && (
+                        <span class="ml-1.5 rounded bg-accent/15 px-1 text-[11px] text-accent" title={`Dipakai di ${used.length} project`}>
+                          {used.length}
+                        </span>
+                      )}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))
+        }
+      </div>
+
+      <div class="lg:sticky lg:top-24 lg:self-start" data-reveal>
+        <div class="rounded-xl border border-line bg-surface p-5">
+          <p class="font-mono text-xs text-muted" aria-live="polite" data-stack-status>Semua project</p>
+          <ul class="mt-4 space-y-1">
+            {
+              projects.map((p) => (
+                <li>
+                  <a
+                    href={`/projects/${p.id}`}
+                    data-stack-project={p.id}
+                    class="flex items-center justify-between gap-3 rounded-md px-2 py-1.5 text-sm transition-[opacity,color] duration-200 hover:text-accent data-[dim]:opacity-30 data-[hl]:text-accent"
+                  >
+                    <span>{p.data.title}</span>
+                    <span class="shrink-0 font-mono text-[11px] text-muted">{p.data.category}</span>
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  import { onPageLoad } from '../../scripts/lifecycle';
+
+  // Hover/focus = pratinjau, klik = kunci pilihan
+  onPageLoad(() => {
+    const root = document.querySelector<HTMLElement>('[data-stack]');
+    if (!root) return;
+    const chips = [...root.querySelectorAll<HTMLButtonElement>('[data-tech]')];
+    const rows = [...root.querySelectorAll<HTMLElement>('[data-stack-project]')];
+    const status = root.querySelector<HTMLElement>('[data-stack-status]')!;
+    let pinned: HTMLButtonElement | null = null;
+
+    const show = (chip: HTMLButtonElement | null) => {
+      if (!chip) {
+        rows.forEach((r) => {
+          r.removeAttribute('data-dim');
+          r.removeAttribute('data-hl');
+        });
+        status.textContent = 'Semua project';
+        return;
+      }
+      const ids = new Set(chip.dataset.techProjects!.split(' ').filter(Boolean));
+      rows.forEach((r) => {
+        const match = ids.has(r.dataset.stackProject!);
+        r.toggleAttribute('data-hl', match);
+        r.toggleAttribute('data-dim', !match);
+      });
+      status.textContent =
+        ids.size > 0
+          ? `${chip.dataset.tech}: dipakai di ${ids.size} project`
+          : `${chip.dataset.tech}: belum tercatat di project mana pun`;
+    };
+
+    const onClick = (event: Event) => {
+      const chip = (event.target as HTMLElement).closest<HTMLButtonElement>('[data-tech]');
+      if (!chip) return;
+      pinned = pinned === chip ? null : chip;
+      chips.forEach((c) => c.setAttribute('aria-pressed', String(c === pinned)));
+      show(pinned);
+    };
+    const onEnter = (event: Event) => {
+      const chip = (event.target as HTMLElement).closest<HTMLButtonElement>('[data-tech]');
+      if (chip) show(chip);
+    };
+    const onLeave = (event: Event) => {
+      if ((event.target as HTMLElement).closest('[data-tech]')) show(pinned);
+    };
+
+    root.addEventListener('click', onClick);
+    root.addEventListener('pointerover', onEnter);
+    root.addEventListener('pointerout', onLeave);
+    root.addEventListener('focusin', onEnter);
+    root.addEventListener('focusout', onLeave);
+  });
+</script>

@@ -1,0 +1,36 @@
+---
+import SectionHeading from '../SectionHeading.astro';
+import { profile } from '../../data/profile';
+
+const paragraphs = [profile.bio.summary, profile.bio.approach, profile.bio.production];
+---
+
+<section id="about" class="border-t border-line py-20 sm:py-28">
+  <div class="mx-auto grid w-full max-w-6xl gap-14 px-4 sm:px-6 lg:grid-cols-[1.2fr_1fr] lg:gap-20">
+    <div>
+      <SectionHeading title="Tentang saya" />
+      <div class="max-w-2xl space-y-5 leading-7 text-muted" data-reveal>
+        {paragraphs.map((p) => <p>{p}</p>)}
+      </div>
+    </div>
+
+    <div>
+      <h3 class="text-lg font-semibold tracking-tight" data-reveal>Prinsip kerja</h3>
+      <dl class="mt-6 divide-y divide-line border-y border-line" data-reveal>
+        {
+          profile.principles.map(({ title, description }) => (
+            <div class="py-5">
+              <dt class="flex items-baseline gap-3 font-medium">
+                <span class="font-mono text-sm text-accent" aria-hidden="true">
+                  ❯
+                </span>
+                {title}
+              </dt>
+              <dd class="mt-1.5 pl-6 text-sm leading-6 text-muted">{description}</dd>
+            </div>
+          ))
+        }
+      </dl>
+    </div>
+  </div>
+</section>

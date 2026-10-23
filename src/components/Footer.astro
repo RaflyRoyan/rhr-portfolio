@@ -4,8 +4,9 @@ import { SITE } from '../consts';
 const year = new Date().getFullYear();
 ---
 
-<footer class="border-t border-zinc-200 dark:border-zinc-800">
-  <div class="mx-auto max-w-3xl px-4 py-6 text-sm text-zinc-500 sm:px-6 dark:text-zinc-400">
-    © {year} {SITE.author}
+<footer class="border-t border-line">
+  <div class="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-2 px-4 py-6 text-sm text-muted sm:px-6">
+    <p>© {year} {SITE.author}</p>
+    <p class="font-mono text-xs">Dibangun dengan Astro, di-deploy di Netlify</p>
   </div>
 </footer>

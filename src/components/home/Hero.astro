@@ -1,0 +1,93 @@
+---
+import CodeCard from './CodeCard.astro';
+import { profile } from '../../data/profile';
+
+interface Props {
+  stats: { value: number; label: string }[];
+}
+
+const { stats } = Astro.props;
+---
+
+<section id="top" class="mx-auto grid w-full max-w-6xl gap-12 px-4 pt-14 pb-20 sm:px-6 sm:pt-20 lg:grid-cols-[1.05fr_1fr] lg:items-center lg:gap-16 lg:pt-24 lg:pb-28">
+  <div>
+    <p class="inline-flex items-center gap-2 font-mono text-xs text-muted sm:text-sm">
+      <span class="size-2 rounded-full bg-accent" aria-hidden="true"></span>
+      {profile.currentPosition}
+    </p>
+    <h1 class="mt-6 text-4xl leading-[1.05] font-semibold tracking-tight text-balance sm:text-5xl lg:text-6xl">
+      {profile.name}
+    </h1>
+    <p class="mt-5 text-lg text-ink sm:text-xl">
+      {profile.title}, {profile.tagline}
+    </p>
+    <p class="mt-4 max-w-xl leading-7 text-muted">{profile.bio.short}</p>
+
+    <div class="mt-8 flex flex-wrap gap-3">
+      <a
+        href="#projects"
+        class="rounded-md bg-accent px-5 py-2.5 text-sm font-medium text-accent-ink transition-opacity hover:opacity-90"
+      >
+        Lihat project
+      </a>
+      <a
+        href="#contact"
+        class="rounded-md border border-line px-5 py-2.5 text-sm font-medium transition-colors hover:border-muted"
+      >
+        Hubungi saya
+      </a>
+    </div>
+
+    <ul class="mt-10 flex flex-wrap gap-2" aria-label="Ringkasan">
+      {
+        stats.map(({ value, label }) => (
+          <li class="rounded-full border border-line bg-surface px-3 py-1.5 font-mono text-xs sm:text-sm">
+            <span class="text-accent tabular-nums" data-count={value}>
+              {value}
+            </span>{' '}
+            <span class="text-muted">{label}</span>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+
+  <CodeCard />
+</section>
+
+<script>
+  import { onPageLoad, prefersReducedMotion } from '../../scripts/lifecycle';
+
+  // Counter beranimasi dari 0 saat masuk viewport
+  onPageLoad(() => {
+    const counters = [...document.querySelectorAll<HTMLElement>('[data-count]')];
+    if (counters.length === 0 || prefersReducedMotion()) return;
+    const frames = new Set<number>();
+
+    const run = (el: HTMLElement) => {
+      const target = Number(el.dataset.count);
+      const start = performance.now();
+      const duration = 1000;
+      const tick = (now: number) => {
+        const t = Math.min((now - start) / duration, 1);
+        el.textContent = String(Math.round(target * (1 - Math.pow(1 - t, 3))));
+        if (t < 1) frames.add(requestAnimationFrame(tick));
+      };
+      frames.add(requestAnimationFrame(tick));
+    };
+
+    counters.forEach((el) => (el.textContent = '0'));
+    const io = new IntersectionObserver((entries) => {
+      for (const entry of entries) {
+        if (!entry.isIntersecting) continue;
+        run(entry.target as HTMLElement);
+        io.unobserve(entry.target);
+      }
+    });
+    counters.forEach((el) => io.observe(el));
+    return () => {
+      io.disconnect();
+      frames.forEach(cancelAnimationFrame);
+    };
+  });
+</script>

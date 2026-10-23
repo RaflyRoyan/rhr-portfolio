@@ -1,0 +1,32 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { Image } from 'astro:assets';
+import ProjectStatus from './ProjectStatus.astro';
+
+interface Props {
+  project: CollectionEntry<'projects'>;
+  size?: 'card' | 'page';
+}
+
+const { project, size = 'card' } = Astro.props;
+const { cover, title, status } = project.data;
+const name = `project-cover-${project.id}`;
+const height = size === 'page' ? 'h-36 sm:h-52' : 'h-24 sm:h-28';
+---
+
+{
+  cover ? (
+    <Image src={cover} alt={`Tampilan ${title}`} class:list={['w-full rounded-lg object-cover', height]} transition:name={name} />
+  ) : (
+    // Cover otomatis bila belum ada gambar: panel grid berisi path dan status project
+    <div
+      class:list={['cover-grid relative w-full overflow-hidden rounded-lg border border-line bg-surface-2', height]}
+      transition:name={name}
+    >
+      <span class="absolute top-3 left-3 font-mono text-xs text-muted" aria-hidden="true">~/projects/{project.id}</span>
+      <span class="absolute bottom-3 left-3 rounded bg-surface px-1.5 py-0.5">
+        <ProjectStatus status={status} />
+      </span>
+    </div>
+  )
+}

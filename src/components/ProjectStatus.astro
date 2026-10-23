@@ -1,0 +1,17 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  status: CollectionEntry<'projects'>['data']['status'];
+}
+
+const { status } = Astro.props;
+const label = { live: 'live', 'in-progress': 'in progress', archived: 'archived' }[status];
+---
+
+<span class="inline-flex items-center gap-1.5 font-mono text-xs text-muted">
+  {status === 'live' && <span class="size-1.5 rounded-full bg-accent" aria-hidden="true" />}
+  {status === 'in-progress' && <span class="size-1.5 rounded-full border border-accent" aria-hidden="true" />}
+  {status === 'archived' && <span class="size-1.5 rounded-full bg-muted" aria-hidden="true" />}
+  {label}
+</span>

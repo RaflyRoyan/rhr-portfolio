@@ -1,0 +1,197 @@
+---
+import { getProjects } from '../lib/collections';
+import { SECTIONS } from '../consts';
+import { profile } from '../data/profile';
+
+type Item = { id: string; group: string; label: string; hint?: string; href?: string; action?: string };
+
+const projects = await getProjects();
+const items: Item[] = [
+  ...SECTIONS.map((s) => ({ id: `s-${s.id}`, group: 'Section', label: s.label, href: `/#${s.id}` })),
+  ...projects.map((p) => ({
+    id: `p-${p.id}`,
+    group: 'Project',
+    label: p.data.title,
+    hint: [p.data.category, ...p.data.tech].join(' '),
+    href: `/projects/${p.id}`,
+  })),
+  { id: 'a-projects', group: 'Aksi', label: 'Buka semua project', href: '/projects' },
+  { id: 'a-theme', group: 'Aksi', label: 'Ganti tema terang/gelap', action: 'theme' },
+  { id: 'a-email', group: 'Aksi', label: 'Salin alamat email', action: 'copy-email' },
+];
+const groups = [...new Set(items.map((i) => i.group))];
+---
+
+<dialog
+  id="cmdk"
+  data-email={profile.contact.email}
+  aria-label="Command palette"
+  class="m-0 mx-auto mt-[12vh] w-[calc(100%-2rem)] max-w-xl rounded-xl border border-line bg-surface p-0 text-ink shadow-2xl backdrop:bg-black/50 backdrop:backdrop-blur-sm"
+>
+  <div class="flex items-center gap-3 border-b border-line px-4">
+    <span class="font-mono text-accent" aria-hidden="true">❯</span>
+    <input
+      id="cmdk-input"
+      type="text"
+      role="combobox"
+      aria-expanded="true"
+      aria-controls="cmdk-list"
+      aria-autocomplete="list"
+      autocomplete="off"
+      spellcheck="false"
+      placeholder="Ketik section, project, atau aksi"
+      class="h-12 w-full bg-transparent font-mono text-sm outline-none placeholder:text-muted"
+    />
+    <kbd class="hidden rounded border border-line px-1.5 font-mono text-[11px] text-muted sm:inline">Esc</kbd>
+  </div>
+  <div id="cmdk-list" role="listbox" aria-label="Hasil" class="max-h-[60vh] overflow-y-auto p-2">
+    {
+      groups.map((group) => (
+        <div role="group" aria-label={group} data-cmdk-group class="mb-1">
+          <p class="px-2 pt-2 pb-1 font-mono text-xs text-muted">{group}</p>
+          {items
+            .filter((i) => i.group === group)
+            .map((item) => (
+              <div
+                id={`cmdk-${item.id}`}
+                role="option"
+                aria-selected="false"
+                data-cmdk-item
+                data-href={item.href}
+                data-action={item.action}
+                data-search={`${item.label} ${item.hint ?? ''}`.toLowerCase()}
+                class="flex cursor-pointer items-center justify-between gap-3 rounded-md px-2 py-2 text-sm aria-selected:bg-surface-2 aria-selected:text-accent"
+              >
+                <span class="truncate">{item.label}</span>
+                {item.href?.startsWith('/#') && <span class="shrink-0 font-mono text-xs text-muted">#{item.href.slice(2)}</span>}
+              </div>
+            ))}
+        </div>
+      ))
+    }
+    <p id="cmdk-empty" hidden class="px-2 py-6 text-center text-sm text-muted">Tidak ada hasil. Coba kata lain, misalnya "oracle".</p>
+  </div>
+</dialog>
+
+<script>
+  import { navigate } from 'astro:transitions/client';
+  import { toggleTheme } from '../scripts/theme';
+  import { copyEmail } from '../scripts/feedback';
+
+  const getDialog = () => document.getElementById('cmdk') as HTMLDialogElement | null;
+  let active = -1;
+
+  function visibleItems() {
+    return [...document.querySelectorAll<HTMLElement>('[data-cmdk-item]')].filter((el) => !el.hidden);
+  }
+
+  function setActive(index: number) {
+    const list = visibleItems();
+    const input = document.getElementById('cmdk-input');
+    list.forEach((el) => el.setAttribute('aria-selected', 'false'));
+    if (list.length === 0) {
+      active = -1;
+      input?.removeAttribute('aria-activedescendant');
+      return;
+    }
+    active = (index + list.length) % list.length;
+    const el = list[active];
+    el.setAttribute('aria-selected', 'true');
+    el.scrollIntoView({ block: 'nearest' });
+    input?.setAttribute('aria-activedescendant', el.id);
+  }
+
+  function filter(query: string) {
+    const q = query.trim().toLowerCase();
+    document.querySelectorAll<HTMLElement>('[data-cmdk-item]').forEach((el) => {
+      el.hidden = q !== '' && !q.split(/\s+/).every((word) => el.dataset.search!.includes(word));
+    });
+    document.querySelectorAll<HTMLElement>('[data-cmdk-group]').forEach((group) => {
+      group.hidden = !group.querySelector('[data-cmdk-item]:not([hidden])');
+    });
+    document.getElementById('cmdk-empty')!.hidden = visibleItems().length > 0;
+    setActive(0);
+  }
+
+  function open() {
+    const dialog = getDialog();
+    if (!dialog || dialog.open) return;
+    const input = document.getElementById('cmdk-input') as HTMLInputElement;
+    input.value = '';
+    filter('');
+    dialog.showModal();
+    input.focus();
+  }
+
+  function close() {
+    getDialog()?.close();
+  }
+
+  function run(el: HTMLElement) {
+    close();
+    const { href, action } = el.dataset;
+    if (action === 'theme') toggleTheme();
+    else if (action === 'copy-email') copyEmail(getDialog()?.dataset.email ?? '');
+    else if (href) {
+      // Section di halaman yang sama: cukup scroll
+      if (href.startsWith('/#') && window.location.pathname === '/') {
+        document.getElementById(href.slice(2))?.scrollIntoView();
+        history.replaceState(null, '', href);
+      } else {
+        navigate(href);
+      }
+    }
+  }
+
+  // Semua listener didelegasikan ke document supaya tetap jalan setelah swap ClientRouter
+  document.addEventListener('keydown', (event) => {
+    if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
+      event.preventDefault();
+      if (getDialog()?.open) close();
+      else open();
+      return;
+    }
+    if (!getDialog()?.open) return;
+    if (event.key === 'ArrowDown') {
+      event.preventDefault();
+      setActive(active + 1);
+    } else if (event.key === 'ArrowUp') {
+      event.preventDefault();
+      setActive(active - 1);
+    } else if (event.key === 'Enter') {
+      const el = visibleItems()[active];
+      if (el) {
+        event.preventDefault();
+        run(el);
+      }
+    }
+  });
+
+  document.addEventListener('input', (event) => {
+    const target = event.target as HTMLElement;
+    if (target.id === 'cmdk-input') filter((target as HTMLInputElement).value);
+  });
+
+  document.addEventListener('click', (event) => {
+    const target = event.target as HTMLElement;
+    if (target.closest('[data-cmdk-open]')) {
+      open();
+      return;
+    }
+    const item = target.closest<HTMLElement>('[data-cmdk-item]');
+    if (item) {
+      run(item);
+      return;
+    }
+    // Klik di backdrop menutup dialog
+    const dialog = getDialog();
+    if (dialog?.open && target === dialog) close();
+  });
+
+  document.addEventListener('mousemove', (event) => {
+    const item = (event.target as HTMLElement).closest<HTMLElement>('[data-cmdk-item]');
+    if (item && item.getAttribute('aria-selected') !== 'true') setActive(visibleItems().indexOf(item));
+  });
+
+  document.addEventListener('astro:before-swap', close);
+</script>

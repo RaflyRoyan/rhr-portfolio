@@ -1,51 +1,35 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import SectionHeading from '../components/SectionHeading.astro';
-import ProjectCard from '../components/ProjectCard.astro';
-import UpdateItem from '../components/UpdateItem.astro';
-import EmptyState from '../components/EmptyState.astro';
+import Hero from '../components/home/Hero.astro';
+import About from '../components/home/About.astro';
+import Services from '../components/home/Services.astro';
+import FeaturedProjects from '../components/home/FeaturedProjects.astro';
+import Experience from '../components/home/Experience.astro';
+import TechStack from '../components/home/TechStack.astro';
+import Updates from '../components/home/Updates.astro';
+import Education from '../components/home/Education.astro';
+import Contact from '../components/home/Contact.astro';
 import { getProjects, getUpdates } from '../lib/collections';
-import { SITE } from '../consts';
+import { profile } from '../data/profile';
 
 const projects = await getProjects();
-const featuredOnly = projects.filter((p) => p.data.featured);
-const featured = (featuredOnly.length > 0 ? featuredOnly : projects).slice(0, 4);
-const updates = (await getUpdates()).slice(0, 5);
+const updates = await getUpdates();
+
+const stats = [
+  { value: projects.length, label: 'project' },
+  { value: updates.length, label: 'update' },
+  { value: profile.certifications.length, label: 'sertifikasi' },
+];
 ---
 
 <BaseLayout>
-  <section class="mb-16">
-    <h1 class="text-3xl font-bold tracking-tight sm:text-4xl">{SITE.title}</h1>
-    <p class="mt-4 text-zinc-600 dark:text-zinc-400">{SITE.description}</p>
-  </section>
-
-  <section class="mb-16">
-    <SectionHeading title="Projects" href="/projects" />
-    {
-      featured.length > 0 ? (
-        <div class="grid gap-4">
-          {featured.map((project) => (
-            <ProjectCard project={project} />
-          ))}
-        </div>
-      ) : (
-        <EmptyState message="Belum ada project." />
-      )
-    }
-  </section>
-
-  <section>
-    <SectionHeading title="Updates" />
-    {
-      updates.length > 0 ? (
-        <ul class="space-y-6">
-          {updates.map((update) => (
-            <UpdateItem update={update} />
-          ))}
-        </ul>
-      ) : (
-        <EmptyState message="Belum ada update." />
-      )
-    }
-  </section>
+  <Hero stats={stats} />
+  <About />
+  <Services />
+  <FeaturedProjects projects={projects} />
+  <Experience />
+  <TechStack projects={projects} />
+  <Updates updates={updates} />
+  <Education />
+  <Contact />
 </BaseLayout>

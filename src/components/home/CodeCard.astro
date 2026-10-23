@@ -1,0 +1,98 @@
+---
+// Kartu IDE "profile.cs": kode di-highlight saat build, efek ketik di client.
+// Tanpa JS (atau dengan reduced motion) kode tampil utuh.
+type Tok = [cls: 'kw' | 'type' | 'str' | 'num' | 'prop' | 'com' | 'punct', text: string];
+
+const lines: Tok[][] = [
+  [['kw', 'var'], ['punct', ' royan = '], ['kw', 'new'], ['punct', ' '], ['type', 'Developer']],
+  [['punct', '{']],
+  [['punct', '    '], ['prop', 'Role'], ['punct', '   = '], ['str', '"Backend Developer"'], ['punct', ',']],
+  [['punct', '    '], ['prop', 'Stack'], ['punct', '  = ['], ['str', '"C#"'], ['punct', ', '], ['str', '".NET"'], ['punct', ', '], ['str', '"Oracle"'], ['punct', '],']],
+  [['punct', '    '], ['prop', 'Domain'], ['punct', ' = '], ['str', '"Regional Revenue"'], ['punct', ',']],
+  [['punct', '    '], ['prop', 'Since'], ['punct', '  = '], ['num', '2025'], ['punct', ',']],
+  [['punct', '    '], ['prop', 'Focus'], ['punct', '  = '], ['str', '"Data integrity"'], ['punct', ',']],
+  [['punct', '};']],
+  [],
+  [['com', '// stability > complexity']],
+];
+
+const escape = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+// HTML dibangun sebagai string supaya whitespace template tidak ikut masuk ke blok kode
+const codeHtml = lines
+  .map((line, i) => {
+    const gutter = `<span class="inline-block w-10 pr-4 text-right text-muted/50 select-none" aria-hidden="true">${i + 1}</span>`;
+    const code = line.map(([cls, text]) => `<span class="tok-${cls}">${escape(text)}</span>`).join('');
+    return `<span class="block">${gutter}${code}</span>`;
+  })
+  .join('');
+---
+
+<figure
+  class="overflow-hidden rounded-xl border border-line bg-surface shadow-[0_24px_60px_-30px_rgb(0_0_0/0.5)]"
+  aria-label="Profil dalam bentuk kode C#"
+>
+  <div class="flex items-center border-b border-line bg-surface-2 text-xs">
+    <span class="border-r border-line border-b-2 border-b-accent bg-surface px-4 py-2.5 font-mono text-ink">profile.cs</span>
+    <span class="px-4 py-2.5 font-mono text-muted">stack.json</span>
+  </div>
+
+  <div class="grid overflow-x-auto py-4 font-mono text-[12.5px] leading-6 sm:text-sm sm:leading-7">
+    <!-- Ghost menahan ukuran supaya tidak ada layout shift saat mengetik -->
+    {
+      ['ghost', 'typed'].map((layer) => (
+        <div
+          class:list={['col-start-1 row-start-1 pr-4 whitespace-pre', layer === 'ghost' && 'invisible']}
+          aria-hidden={layer === 'ghost' ? 'true' : undefined}
+          data-typing={layer === 'typed' ? '' : undefined}
+          set:html={codeHtml}
+        />
+      ))
+    }
+  </div>
+
+  <figcaption class="flex justify-between gap-4 border-t border-line bg-surface-2 px-4 py-1.5 font-mono text-[11px] text-muted">
+    <span><span class="text-accent">●</span> main</span>
+    <span>C#   UTF-8   Ln {lines.length}</span>
+  </figcaption>
+</figure>
+
+<script>
+  import { onPageLoad, prefersReducedMotion } from '../../scripts/lifecycle';
+
+  onPageLoad(() => {
+    const pre = document.querySelector<HTMLElement>('[data-typing]');
+    if (!pre) return;
+    const caret = document.createElement('span');
+    caret.className = 'caret';
+    caret.setAttribute('aria-hidden', 'true');
+
+    // Token kode (bukan nomor baris)
+    const tokens = [...pre.querySelectorAll<HTMLElement>('[class^="tok-"]')];
+    if (prefersReducedMotion() || tokens.length === 0) {
+      tokens.at(-1)?.after(caret);
+      return;
+    }
+
+    const full = tokens.map((t) => t.textContent ?? '');
+    tokens.forEach((t) => (t.textContent = ''));
+    let ti = 0;
+    let ci = 0;
+    let timer = 0;
+
+    const step = () => {
+      if (ti >= tokens.length) return;
+      const token = tokens[ti];
+      token.textContent = full[ti].slice(0, ++ci);
+      token.after(caret);
+      if (ci >= full[ti].length) {
+        ti++;
+        ci = 0;
+      }
+      // Jeda sedikit lebih lama di akhir baris
+      const endOfLine = ci === 0 && tokens[ti]?.parentElement !== token.parentElement;
+      timer = window.setTimeout(step, endOfLine ? 110 : 11);
+    };
+    timer = window.setTimeout(step, 400);
+    return () => window.clearTimeout(timer);
+  });
+</script>

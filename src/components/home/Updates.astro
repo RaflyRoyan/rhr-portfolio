@@ -1,0 +1,117 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import SectionHeading from '../SectionHeading.astro';
+import { UPDATE_CATEGORIES } from '../../content.config';
+
+interface Props {
+  updates: CollectionEntry<'updates'>[];
+}
+
+const { updates } = Astro.props;
+const LIMIT = 6;
+const tabs = [{ value: 'all', label: 'All' }, ...UPDATE_CATEGORIES.map((c) => ({ value: c, label: c }))];
+const counts = Object.fromEntries(tabs.map((t) => [t.value, t.value === 'all' ? updates.length : updates.filter((u) => u.data.category === t.value).length]));
+const formatMonth = (d: Date) => d.toLocaleDateString('id-ID', { month: 'short', year: 'numeric' });
+---
+
+<section id="updates" class="border-t border-line py-20 sm:py-28">
+  <div class="mx-auto w-full max-w-6xl px-4 sm:px-6" data-updates data-limit={LIMIT}>
+    <SectionHeading title="Update terbaru" note="Catatan kerja, terbaru di atas." />
+
+    <div class="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0" data-reveal>
+      <div class="inline-flex gap-1 rounded-lg border border-line bg-surface p-1" role="group" aria-label="Filter kategori">
+        {
+          tabs.map((tab) => (
+            <button
+              type="button"
+              data-filter={tab.value}
+              aria-pressed={tab.value === 'all' ? 'true' : 'false'}
+              class="rounded-md px-3 py-1.5 text-sm whitespace-nowrap text-muted transition-colors hover:text-ink aria-pressed:bg-surface-2 aria-pressed:text-ink"
+            >
+              {tab.label}
+              <span class="ml-1 font-mono text-xs text-muted">{counts[tab.value]}</span>
+            </button>
+          ))
+        }
+      </div>
+    </div>
+
+    <ol class="mt-8 max-w-3xl divide-y divide-line border-y border-line font-mono text-sm" data-updates-list>
+      {
+        updates.map((u, i) => (
+          <li data-category={u.data.category} hidden={i >= LIMIT} class="grid gap-x-6 gap-y-1 py-5 sm:grid-cols-[6rem_1fr]">
+            <time datetime={u.data.date.toISOString()} class="text-xs leading-6 text-muted">
+              {formatMonth(u.data.date)}
+            </time>
+            <div class="font-sans">
+              <p class="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                <span class="font-medium">{u.data.title}</span>
+                <span class="font-mono text-xs text-accent">{u.data.category.toLowerCase()}</span>
+              </p>
+              <p class="mt-1.5 leading-6 text-muted">{u.data.summary}</p>
+              {u.data.relatedProject && (
+                <a href={`/projects/${u.data.relatedProject.id}`} class="mt-2 inline-block text-sm text-accent hover:underline">
+                  Lihat project terkait
+                </a>
+              )}
+            </div>
+          </li>
+        ))
+      }
+    </ol>
+
+    <button
+      type="button"
+      data-show-all
+      hidden={updates.length <= LIMIT}
+      class="mt-6 rounded-md border border-line px-4 py-2 text-sm font-medium transition-colors hover:border-muted"
+    >
+      Lihat semua update
+    </button>
+  </div>
+</section>
+
+<script>
+  import { onPageLoad, prefersReducedMotion } from '../../scripts/lifecycle';
+
+  onPageLoad(() => {
+    const root = document.querySelector<HTMLElement>('[data-updates]');
+    if (!root) return;
+    const limit = Number(root.dataset.limit);
+    const items = [...root.querySelectorAll<HTMLElement>('[data-updates-list] > li')];
+    const tabs = [...root.querySelectorAll<HTMLButtonElement>('[data-filter]')];
+    const more = root.querySelector<HTMLButtonElement>('[data-show-all]')!;
+    let filter = 'all';
+    let expanded = false;
+
+    const render = (animate: boolean) => {
+      const matches = items.filter((li) => filter === 'all' || li.dataset.category === filter);
+      items.forEach((li) => {
+        const wasHidden = li.hidden;
+        const index = matches.indexOf(li);
+        li.hidden = index === -1 || (!expanded && index >= limit);
+        li.classList.remove('enter');
+        if (animate && !li.hidden && !prefersReducedMotion()) {
+          // Paksa reflow supaya animasi bisa diputar ulang
+          void li.offsetWidth;
+          li.style.setProperty('--i', String(wasHidden ? index % limit : 0));
+          li.classList.add('enter');
+        }
+      });
+      more.hidden = expanded || matches.length <= limit;
+    };
+
+    root.addEventListener('click', (event) => {
+      const target = event.target as HTMLElement;
+      const tab = target.closest<HTMLButtonElement>('[data-filter]');
+      if (tab) {
+        filter = tab.dataset.filter!;
+        tabs.forEach((t) => t.setAttribute('aria-pressed', String(t === tab)));
+        render(true);
+      } else if (target.closest('[data-show-all]')) {
+        expanded = true;
+        render(true);
+      }
+    });
+  });
+</script>

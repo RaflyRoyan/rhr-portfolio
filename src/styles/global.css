@@ -8,14 +8,340 @@
   --font-mono: 'JetBrains Mono Variable', ui-monospace, SFMono-Regular, monospace;
 }
 
+/* Token warna; nilai berganti antara light dan dark */
+@theme inline {
+  --color-canvas: var(--canvas);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-line: var(--line);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+}
+
+:root {
+  --canvas: #f4f7f8;
+  --surface: #ffffff;
+  --surface-2: #eaf0f2;
+  --line: #d4dde2;
+  --ink: #0e1a22;
+  --muted: #55677a;
+  --accent: #0a8f67;
+  --accent-ink: #ffffff;
+
+  /* Syntax highlighting */
+  --tok-kw: #0a8f67;
+  --tok-type: #2f6690;
+  --tok-str: #8a5a12;
+  --tok-num: #a0452d;
+  --tok-prop: #0e1a22;
+  --tok-com: #6b7c8c;
+  --tok-punct: #55677a;
+}
+
+.dark {
+  --canvas: #0d1318;
+  --surface: #121a21;
+  --surface-2: #17222b;
+  --line: #22303b;
+  --ink: #e2e8ee;
+  --muted: #8696a5;
+  --accent: #3dd6a3;
+  --accent-ink: #062a1e;
+
+  --tok-kw: #3dd6a3;
+  --tok-type: #8fbfe0;
+  --tok-str: #dcc9a0;
+  --tok-num: #e7a77d;
+  --tok-prop: #e2e8ee;
+  --tok-com: #637484;
+  --tok-punct: #8696a5;
+}
+
 @layer base {
   html {
     color-scheme: light;
+    scroll-padding-top: 5rem;
   }
   html.dark {
     color-scheme: dark;
   }
-  body {
-    @apply bg-white text-zinc-900 antialiased dark:bg-zinc-950 dark:text-zinc-100;
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
   }
+  body {
+    @apply bg-canvas text-ink antialiased;
+  }
+  ::selection {
+    background: color-mix(in oklab, var(--accent) 30%, transparent);
+  }
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+}
+
+/* Reveal on scroll: hanya disembunyikan jika JS aktif */
+.js [data-reveal] {
+  opacity: 0;
+  transform: translateY(12px);
+  transition:
+    opacity 0.6s ease,
+    transform 0.6s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.js [data-reveal].is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* Spotlight: gradient mengikuti kursor (--mx/--my diisi JS) */
+.spotlight {
+  position: relative;
+  isolation: isolate;
+}
+.spotlight::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: radial-gradient(
+    420px circle at var(--mx, 50%) var(--my, 50%),
+    color-mix(in oklab, var(--accent) 14%, transparent),
+    transparent 65%
+  );
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+.spotlight:hover::before {
+  opacity: 1;
+}
+
+/* Syntax highlighting kartu kode */
+.tok-kw { color: var(--tok-kw); }
+.tok-type { color: var(--tok-type); }
+.tok-str { color: var(--tok-str); }
+.tok-num { color: var(--tok-num); }
+.tok-prop { color: var(--tok-prop); }
+.tok-com { color: var(--tok-com); font-style: italic; }
+.tok-punct { color: var(--tok-punct); }
+
+.caret {
+  display: inline-block;
+  width: 0.55em;
+  height: 1.1em;
+  margin-left: 1px;
+  vertical-align: text-bottom;
+  background: var(--accent);
+  animation: caret-blink 1s steps(1) infinite;
+}
+@keyframes caret-blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+/* Item yang muncul setelah filter */
+.enter {
+  animation: enter 0.35s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  animation-delay: calc(var(--i, 0) * 30ms);
+}
+@keyframes enter {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+/* Grid halus untuk cover project yang dibuat otomatis */
+.cover-grid {
+  background-image:
+    linear-gradient(var(--line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line) 1px, transparent 1px);
+  background-size: 24px 24px;
+  background-position: -1px -1px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .js [data-reveal] {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .caret,
+  .enter {
+    animation: none;
+  }
+  .spotlight::before {
+    transition: none;
+  }
+}
+
+/* Tipografi body markdown project */
+.prose-project {
+  color: var(--muted);
+  line-height: 1.8;
+}
+.prose-project > * + * {
+  margin-top: 1.1rem;
+}
+.prose-project h2 {
+  margin-top: 3rem;
+  scroll-margin-top: 5.5rem;
+  color: var(--ink);
+  font-size: 1.375rem;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  line-height: 1.3;
+}
+.prose-project h3 {
+  margin-top: 2rem;
+  scroll-margin-top: 5.5rem;
+  color: var(--ink);
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+.prose-project > h2:first-child {
+  margin-top: 0;
+}
+.prose-project ul,
+.prose-project ol {
+  padding-left: 1.25rem;
+}
+.prose-project ul {
+  list-style: none;
+}
+.prose-project ul > li {
+  position: relative;
+}
+.prose-project ul > li::before {
+  content: '–';
+  position: absolute;
+  left: -1.1rem;
+  color: var(--accent);
+}
+.prose-project ol {
+  list-style: decimal;
+}
+.prose-project ol > li::marker {
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+}
+.prose-project li + li,
+.prose-project li > ul,
+.prose-project li > ol {
+  margin-top: 0.45rem;
+}
+.prose-project strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+.prose-project a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+.prose-project blockquote {
+  border-left: 2px solid var(--accent);
+  padding-left: 1rem;
+  color: var(--ink);
+}
+.prose-project :not(pre) > code {
+  border: 1px solid var(--line);
+  border-radius: 0.3rem;
+  background: var(--surface-2);
+  padding: 0.1rem 0.35rem;
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+}
+.prose-project pre {
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 0.75rem;
+  padding: 1rem 1.25rem;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  line-height: 1.7;
+}
+.prose-project hr {
+  border-color: var(--line);
+}
+.prose-project table {
+  width: 100%;
+  font-size: 0.9rem;
+  border-collapse: collapse;
+}
+.prose-project th,
+.prose-project td {
+  border-bottom: 1px solid var(--line);
+  padding: 0.5rem 0.75rem 0.5rem 0;
+  text-align: left;
+}
+.prose-project th {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+/* Shiki dual theme (defaultColor: false) */
+.astro-code,
+.astro-code span {
+  color: var(--shiki-light);
+  background-color: var(--shiki-light-bg);
+}
+.dark .astro-code,
+.dark .astro-code span {
+  color: var(--shiki-dark);
+  background-color: var(--shiki-dark-bg);
+}
+
+/* Diagram Mermaid (SVG hasil build) mengikuti token tema */
+.prose-project .diagram {
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 0.75rem;
+  background: var(--surface);
+  padding: 1.25rem;
+}
+.prose-project .diagram svg {
+  display: block;
+  margin-inline: auto;
+  /* Di layar sempit diagram di-scroll, tidak dikecilkan */
+  min-width: 34rem;
+  height: auto;
+}
+svg[id^='mermaid'] .node :is(rect, path, polygon, circle, ellipse) {
+  fill: var(--surface-2) !important;
+  stroke: var(--line) !important;
+}
+svg[id^='mermaid'] .cluster rect {
+  fill: transparent !important;
+  stroke: var(--line) !important;
+  stroke-dasharray: 4 3;
+}
+svg[id^='mermaid'] .flowchart-link {
+  stroke: var(--muted) !important;
+}
+svg[id^='mermaid'] :is(.marker, .arrowMarkerPath) {
+  fill: var(--muted) !important;
+  stroke: var(--muted) !important;
+}
+svg[id^='mermaid'] :is(.nodeLabel, .edgeLabel, .cluster-label, .label, text, span, p) {
+  color: var(--ink) !important;
+  fill: var(--ink) !important;
+}
+svg[id^='mermaid'] .cluster-label :is(span, p) {
+  color: var(--muted) !important;
+}
+svg[id^='mermaid'] :is(.edgeLabel, .labelBkg, .edgeLabel p) {
+  background-color: var(--surface) !important;
+}
+svg[id^='mermaid'] .edgeLabel rect {
+  fill: var(--surface) !important;
 }

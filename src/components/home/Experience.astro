@@ -1,0 +1,88 @@
+---
+import SectionHeading from '../SectionHeading.astro';
+import { profile } from '../../data/profile';
+---
+
+<section id="experience" class="border-t border-line py-20 sm:py-28">
+  <div class="mx-auto w-full max-w-6xl px-4 sm:px-6">
+    <SectionHeading title="Pengalaman" />
+    <div class="relative max-w-3xl" data-timeline>
+      <!-- Track + progress yang terisi saat scroll -->
+      <span class="absolute top-2 bottom-2 left-[7px] w-px bg-line" aria-hidden="true"></span>
+      <span
+        class="absolute top-2 bottom-2 left-[7px] w-px origin-top bg-accent"
+        style="transform: scaleY(var(--progress, 1))"
+        aria-hidden="true"
+      ></span>
+
+    <ol class="flex flex-col gap-12 pl-9">
+      {
+        profile.experience.map((job) => (
+          <li class="relative" data-timeline-item data-reveal>
+            <span
+              class="absolute top-1.5 -left-9 size-[15px] rounded-full border-2 border-line bg-canvas transition-colors duration-300 data-[reached]:border-accent"
+              data-timeline-dot
+              data-reached
+              aria-hidden="true"
+            />
+            <p class="flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-xs text-muted sm:text-sm">
+              {job.period}
+              {job.active && <span class="rounded border border-accent/50 px-1.5 text-[11px] text-accent">aktif</span>}
+            </p>
+            <h3 class="mt-2 text-xl font-semibold tracking-tight">{job.role}</h3>
+            <p class="mt-1 text-muted">{job.company}</p>
+            <p class="mt-4 max-w-2xl leading-7 text-muted">{job.description}</p>
+            <ul class="mt-4 space-y-2 text-sm leading-6">
+              {job.points.map((point) => (
+                <li class="flex gap-3">
+                  <span class="font-mono text-accent" aria-hidden="true">
+                    +
+                  </span>
+                  <span>{point}</span>
+                </li>
+              ))}
+            </ul>
+          </li>
+        ))
+      }
+    </ol>
+    </div>
+  </div>
+</section>
+
+<script>
+  import { onPageLoad, prefersReducedMotion } from '../../scripts/lifecycle';
+
+  // Progress line terisi mengikuti posisi scroll; titik menyala setelah dilewati
+  onPageLoad(() => {
+    const timeline = document.querySelector<HTMLElement>('[data-timeline]');
+    if (!timeline || prefersReducedMotion()) return;
+    const dots = [...timeline.querySelectorAll<HTMLElement>('[data-timeline-dot]')];
+    let ticking = false;
+
+    const update = () => {
+      ticking = false;
+      const rect = timeline.getBoundingClientRect();
+      const anchor = window.innerHeight * 0.6;
+      const progress = Math.min(Math.max((anchor - rect.top) / rect.height, 0), 1);
+      timeline.style.setProperty('--progress', progress.toFixed(4));
+      dots.forEach((dot) => {
+        const reached = dot.getBoundingClientRect().top < anchor;
+        dot.toggleAttribute('data-reached', reached);
+      });
+    };
+    const onScroll = () => {
+      if (!ticking) {
+        ticking = true;
+        requestAnimationFrame(update);
+      }
+    };
+    update();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+    };
+  });
+</script>

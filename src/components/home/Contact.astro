@@ -1,0 +1,45 @@
+---
+import { profile } from '../../data/profile';
+
+const { email, whatsapp, phone, location, cta } = profile.contact;
+---
+
+<section id="contact" class="border-t border-line py-20 sm:py-28">
+  <div class="mx-auto w-full max-w-6xl px-4 sm:px-6">
+    <div class="max-w-3xl" data-reveal>
+      <h2 class="text-3xl font-semibold tracking-tight sm:text-4xl">Mari bekerja sama</h2>
+      <p class="mt-4 max-w-xl leading-7 text-muted">{cta}</p>
+
+      <div class="mt-10 rounded-xl border border-line bg-surface p-2">
+        <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
+          <a href={`mailto:${email}`} class="min-w-0 flex-1 truncate rounded-lg px-4 py-3 font-mono text-base hover:text-accent sm:text-lg">
+            <span class="text-accent" aria-hidden="true">❯ </span>{email}
+          </a>
+          <button
+            type="button"
+            data-copy-email={email}
+            class="rounded-lg bg-accent px-4 py-3 text-sm font-medium text-accent-ink transition-opacity hover:opacity-90"
+          >
+            Salin email
+          </button>
+        </div>
+      </div>
+
+      <div class="mt-4 flex flex-wrap items-center gap-x-6 gap-y-3 text-sm">
+        <a href={whatsapp} target="_blank" rel="noopener noreferrer" class="font-medium text-accent hover:underline">
+          Chat lewat WhatsApp ({phone})
+        </a>
+        <span class="text-muted">{location}</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  import { copyEmail } from '../../scripts/feedback';
+
+  document.addEventListener('click', (event) => {
+    const button = (event.target as HTMLElement).closest<HTMLElement>('[data-copy-email]');
+    if (button) copyEmail(button.dataset.copyEmail!);
+  });
+</script>

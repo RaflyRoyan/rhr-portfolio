@@ -1,0 +1,27 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import SectionHeading from '../SectionHeading.astro';
+import ProjectCard from '../ProjectCard.astro';
+
+interface Props {
+  projects: CollectionEntry<'projects'>[];
+}
+
+const { projects } = Astro.props;
+---
+
+<section id="projects" class="border-t border-line py-20 sm:py-28">
+  <div class="mx-auto w-full max-w-6xl px-4 sm:px-6">
+    <SectionHeading title="Project pilihan" note="Sistem internal Bapenda Kota Surabaya. Detail sensitif sengaja disamarkan." />
+    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {
+        projects.map((project) => (
+          <div class:list={['flex', project.data.featured && 'lg:col-span-2']} data-reveal>
+            <ProjectCard project={project} class="w-full" />
+          </div>
+        ))
+      }
+    </div>
+    <a href="/projects" class="mt-8 inline-block text-sm font-medium text-accent hover:underline">Buka halaman semua project</a>
+  </div>
+</section>

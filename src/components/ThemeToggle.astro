@@ -2,7 +2,7 @@
   type="button"
   data-theme-toggle
   aria-label="Ganti tema"
-  class="rounded-md p-2 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
+  class="rounded-md p-2 text-muted transition-colors hover:bg-surface-2 hover:text-ink"
 >
   <!-- Ikon matahari tampil di dark mode, bulan di light mode -->
   <svg class="hidden size-5 dark:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -15,14 +15,11 @@
 </button>
 
 <script>
+  import { toggleTheme } from '../scripts/theme';
+
   // Delegasi event: tetap jalan setelah navigasi ClientRouter tanpa re-bind
   document.addEventListener('click', (event) => {
     const target = event.target as Element | null;
-    if (!target?.closest('[data-theme-toggle]')) return;
-    const dark = !document.documentElement.classList.contains('dark');
-    document.documentElement.classList.toggle('dark', dark);
-    try {
-      localStorage.setItem('theme', dark ? 'dark' : 'light');
-    } catch {}
+    if (target?.closest('[data-theme-toggle]')) toggleTheme();
   });
 </script>

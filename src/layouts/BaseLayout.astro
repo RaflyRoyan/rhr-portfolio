@@ -5,6 +5,7 @@ import '../styles/global.css';
 import { ClientRouter } from 'astro:transitions';
 import Navbar from '../components/Navbar.astro';
 import Footer from '../components/Footer.astro';
+import CommandPalette from '../components/CommandPalette.astro';
 import { SITE } from '../consts';
 
 interface Props {
@@ -14,7 +15,7 @@ interface Props {
 }
 
 const { title, description = SITE.description, image = SITE.ogImage } = Astro.props;
-const pageTitle = title ? `${title} · ${SITE.title}` : SITE.title;
+const pageTitle = title ? `${title} | ${SITE.title}` : `${SITE.title}, Backend Developer`;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const ogImage = new URL(image, Astro.site);
 ---
@@ -37,7 +38,7 @@ const ogImage = new URL(image, Astro.site);
     <meta property="og:image" content={ogImage} />
     <meta name="twitter:card" content="summary_large_image" />
 
-    <!-- Terapkan tema sebelum paint supaya tidak flash; diterapkan ulang setelah swap ClientRouter -->
+    <!-- Terapkan tema + flag .js sebelum paint supaya tidak flash; diterapkan ulang setelah swap ClientRouter -->
     <script is:inline>
       (() => {
         const media = window.matchMedia('(prefers-color-scheme: dark)');
@@ -48,6 +49,7 @@ const ogImage = new URL(image, Astro.site);
           } catch {}
           const dark = stored ? stored === 'dark' : media.matches;
           document.documentElement.classList.toggle('dark', dark);
+          document.documentElement.classList.add('js');
         };
         apply();
         if (!window.__themeInit) {
@@ -61,10 +63,49 @@ const ogImage = new URL(image, Astro.site);
     <ClientRouter />
   </head>
   <body class="flex min-h-dvh flex-col font-sans">
+    <a
+      href="#main"
+      class="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:rounded-md focus:bg-accent focus:px-3 focus:py-2 focus:text-accent-ink"
+      >Lewati ke konten</a
+    >
     <Navbar />
-    <main class="mx-auto w-full max-w-3xl flex-1 px-4 py-12 sm:px-6">
+    <main id="main" class="flex-1">
       <slot />
     </main>
     <Footer />
+    <CommandPalette />
+    <div
+      id="toast"
+      role="status"
+      aria-live="polite"
+      data-open="false"
+      class="pointer-events-none fixed bottom-5 left-1/2 z-50 -translate-x-1/2 rounded-md border border-line bg-surface px-4 py-2.5 font-mono text-sm text-ink shadow-lg transition-all duration-300 data-[open=false]:translate-y-3 data-[open=false]:opacity-0 motion-reduce:transition-none"
+    >
+    </div>
   </body>
 </html>
+
+<script>
+  import { onPageLoad, prefersReducedMotion } from '../scripts/lifecycle';
+
+  // Reveal on scroll untuk semua elemen [data-reveal]
+  onPageLoad(() => {
+    const items = document.querySelectorAll<HTMLElement>('[data-reveal]');
+    if (prefersReducedMotion() || !('IntersectionObserver' in window)) {
+      items.forEach((el) => el.classList.add('is-visible'));
+      return;
+    }
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
+          entry.target.classList.add('is-visible');
+          io.unobserve(entry.target);
+        }
+      },
+      { rootMargin: '0px 0px -10% 0px' },
+    );
+    items.forEach((el) => io.observe(el));
+    return () => io.disconnect();
+  });
+</script>

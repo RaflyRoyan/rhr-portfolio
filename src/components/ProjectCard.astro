@@ -1,31 +1,47 @@
 ---
 import type { CollectionEntry } from 'astro:content';
-import FormattedDate from './FormattedDate.astro';
+import ProjectCover from './ProjectCover.astro';
+import ProjectStatus from './ProjectStatus.astro';
 
 interface Props {
   project: CollectionEntry<'projects'>;
+  class?: string;
 }
 
-const { project } = Astro.props;
-const { title, description, date, stack } = project.data;
+const { project, class: className } = Astro.props;
+const { title, summary, category, status, tech, featured, cover } = project.data;
+const maxChips = featured ? 6 : 4;
+const shown = tech.slice(0, maxChips);
+const rest = tech.length - shown.length;
 ---
 
 <a
   href={`/projects/${project.id}`}
-  class="block rounded-lg border border-zinc-200 p-5 transition-colors hover:border-zinc-400 dark:border-zinc-800 dark:hover:border-zinc-600"
+  data-project={project.id}
+  class:list={[
+    'group flex flex-col gap-4 rounded-xl border border-line bg-surface p-3 transition-[border-color,opacity] duration-300 hover:border-muted data-[dim]:opacity-35 data-[hl]:border-accent',
+    className,
+  ]}
 >
-  <div class="flex items-baseline justify-between gap-4">
-    <h3 class="font-semibold" transition:name={`project-title-${project.id}`}>{title}</h3>
-    <FormattedDate date={date} class="shrink-0 font-mono text-xs text-zinc-500" />
+  <ProjectCover project={project} />
+  <div class="flex flex-1 flex-col px-1 pb-1">
+    <div class="flex items-center justify-between gap-3">
+      <span class="font-mono text-xs text-muted">{category}</span>
+      {cover && <ProjectStatus status={status} />}
+    </div>
+    <h3 class="mt-2 text-lg font-semibold tracking-tight group-hover:text-accent" transition:name={`project-title-${project.id}`}>
+      <span>{title}</span>
+    </h3>
+    <p class="mt-2 text-sm leading-6 text-muted">{summary}</p>
+    {
+      shown.length > 0 && (
+        <ul class="mt-auto flex flex-wrap gap-1.5 pt-4" aria-label="Teknologi" transition:name={`project-tech-${project.id}`}>
+          {shown.map((item) => (
+            <li class="rounded border border-line px-1.5 py-0.5 font-mono text-[11px] text-muted">{item}</li>
+          ))}
+          {rest > 0 && <li class="px-1 py-0.5 font-mono text-[11px] text-muted">+{rest}</li>}
+        </ul>
+      )
+    }
   </div>
-  <p class="mt-2 text-sm text-zinc-600 dark:text-zinc-400">{description}</p>
-  {
-    stack.length > 0 && (
-      <ul class="mt-4 flex flex-wrap gap-2">
-        {stack.map((item) => (
-          <li class="rounded bg-zinc-100 px-2 py-0.5 font-mono text-xs text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">{item}</li>
-        ))}
-      </ul>
-    )
-  }
 </a>
