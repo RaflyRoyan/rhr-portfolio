@@ -1,10 +1,11 @@
 [build]
-  command = "npm run build"
+  # Chromium Playwright dibutuhkan untuk merender diagram Mermaid saat build
+  command = "npx playwright install chromium && npm run build"
   publish = "dist"
 
 [build.environment]
-  # Astro 7 butuh Node >= 22.23.4; "22" = rilis 22.x terbaru di Netlify
-  NODE_VERSION = "22"
+  # Samakan dengan .node-version (astro dipin ke 7.3.8 agar kompatibel Node 22.21)
+  NODE_VERSION = "22.21.0"
 
 # Aset hasil build Astro ber-hash, aman di-cache selamanya
 [[headers]]
