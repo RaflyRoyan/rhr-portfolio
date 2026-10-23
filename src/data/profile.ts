@@ -111,7 +111,6 @@ export const profile = {
     Integration: ['REST API', 'Database link', 'Payment / QRIS / VA', 'SSE (Server-Sent Events)', 'Payment callback'],
     Desktop: ['C# WinForms'],
     Tools: ['Git', 'Visual Studio', 'Oracle tools'],
-    Architecture: ['Layered architecture', 'Repository/Service pattern', 'Asynchronous processing'],
   } as Record<string, string[]>,
 
   strengths: [

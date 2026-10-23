@@ -1,7 +1,6 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 import SectionHeading from '../SectionHeading.astro';
-import Doodle from '../Doodle.astro';
 import { profile } from '../../data/profile';
 
 interface Props {
@@ -60,9 +59,6 @@ const SYMBOLS: Record<string, string> = {
   git: 'Gt',
   'visual studio': 'Vs',
   'oracle tools': 'Ot',
-  'layered architecture': 'La',
-  'repository/service pattern': 'Rp',
-  'asynchronous processing': 'Ap',
 };
 const symbolOf = (name: string) => {
   const letters = name.replace(/[^a-z]/gi, '');
@@ -92,70 +88,77 @@ const groups = Object.entries(profile.skills).map(([group, skills], g) => ({
   <div class="mx-auto w-full max-w-6xl px-4 sm:px-6" data-stack>
     <SectionHeading title="Tabel periodik teknologi" doodle="braces" note="Klik satu elemen untuk melihat project yang memakainya." />
 
-    <p class="hand -mt-6 mb-4 flex items-center gap-2 text-lg lg:hidden" aria-hidden="true">
-      geser ke samping
-      <Doodle name="arrow-right" class="h-4 w-8" />
-    </p>
-
-    <div class="-mx-4 overflow-x-auto px-4 pb-4 sm:-mx-6 sm:px-6" data-reveal>
-      <div class="grid min-w-[54rem] grid-cols-7 items-start gap-2.5">
+    <div class="grid gap-6 lg:grid-cols-[1fr_20rem] lg:items-start lg:gap-10">
+      <!-- Golongan sebagai baris; elemen mengalir sebagai chip -->
+      <dl class="divide-y divide-dashed divide-line rounded-2xl border-2 border-ink bg-surface px-5 sm:px-6" data-reveal>
         {
           groups.map(({ group, tone, skills }) => (
-            <div>
-              <h3 class="hand mb-2 text-center text-lg font-bold">{group}</h3>
-              <ul class="space-y-2.5">
-                {skills.map(({ name, symbol, number, projects: used }) => (
-                  <li>
-                    <button
-                      type="button"
-                      aria-pressed="false"
-                      aria-label={`${name}, dipakai di ${used.length} project`}
-                      data-tech={name}
-                      data-tech-symbol={symbol}
-                      data-tech-group={group}
-                      data-tech-number={number}
-                      data-tech-projects={used.join(' ')}
-                      class:list={[
-                        'flex h-24 w-full flex-col justify-between rounded-lg border-2 border-ink p-2 text-left transition-[translate,box-shadow,background-color,color] duration-200 hover:-translate-y-0.5 hover:shadow-[3px_3px_0_var(--ink)] aria-pressed:bg-ink aria-pressed:text-canvas',
-                        tone,
-                      ]}
-                    >
-                      <span class="flex items-center justify-between font-mono text-[10px] opacity-70">
-                        <span>{number}</span>
-                        {used.length > 0 && <span title={`Dipakai di ${used.length} project`}>{used.length}×</span>}
-                      </span>
-                      <span class="text-2xl leading-none font-extrabold tracking-tight">{symbol}</span>
-                      <span class="line-clamp-2 text-[10.5px] leading-tight font-medium">{name}</span>
-                    </button>
-                  </li>
-                ))}
-              </ul>
+            <div class="grid gap-3 py-5 sm:grid-cols-[9rem_1fr] sm:gap-6">
+              <dt class="flex items-center gap-2 sm:pt-1.5">
+                <span class:list={['size-3 shrink-0 rounded-sm border border-ink', tone]} aria-hidden="true" />
+                <span class="hand text-lg leading-tight font-bold">{group}</span>
+              </dt>
+              <dd>
+                <ul class="flex flex-wrap gap-2">
+                  {skills.map(({ name, symbol, number, projects: used }) => (
+                    <li>
+                      <button
+                        type="button"
+                        aria-pressed="false"
+                        aria-label={`${name}, dipakai di ${used.length} project`}
+                        data-tech={name}
+                        data-tech-symbol={symbol}
+                        data-tech-group={group}
+                        data-tech-number={number}
+                        data-tech-projects={used.join(' ')}
+                        class="group inline-flex items-center gap-2 rounded-lg border border-line bg-canvas py-1 pr-3 pl-1 text-sm transition-[translate,border-color,background-color,color] duration-200 hover:-translate-y-0.5 hover:border-ink aria-pressed:border-ink aria-pressed:bg-ink aria-pressed:text-canvas"
+                      >
+                        <span
+                          class:list={[
+                            'grid size-7 shrink-0 place-items-center rounded-md border border-ink font-mono text-[11px] font-bold text-ink',
+                            tone,
+                          ]}
+                          aria-hidden="true"
+                        >
+                          {symbol}
+                        </span>
+                        <span class="font-medium">{name}</span>
+                        {used.length > 0 && (
+                          <span class="font-mono text-[10px] text-muted group-aria-pressed:text-canvas/70" aria-hidden="true">
+                            {used.length}×
+                          </span>
+                        )}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </dd>
             </div>
           ))
         }
-      </div>
-    </div>
+      </dl>
 
-    <!-- Panel detail: elemen terpilih diperbesar + daftar project -->
-    <div class="mt-8 grid gap-6 rounded-2xl border-2 border-ink bg-surface p-5 shadow-[5px_5px_0_var(--ink)] sm:p-6 md:grid-cols-[13rem_1fr] md:gap-8" data-reveal>
-      <div class="flex aspect-square flex-col justify-between rounded-xl border-2 border-ink bg-note p-4 text-ink" aria-hidden="true">
-        <span class="font-mono text-xs opacity-70" data-stack-number>—</span>
-        <span class="text-7xl leading-none font-extrabold tracking-tight" data-stack-symbol>?</span>
-        <span>
-          <span class="block font-bold" data-stack-name>Pilih elemen</span>
-          <span class="block text-xs opacity-70" data-stack-group>dari tabel di atas</span>
-        </span>
-      </div>
-      <div>
-        <p class="hand text-xl" aria-live="polite" data-stack-status>Semua project</p>
-        <ul class="mt-3 grid gap-x-8 gap-y-0.5 sm:grid-cols-2">
+      <!-- Panel detail: elemen terpilih + daftar project -->
+      <aside class="rounded-2xl border-2 border-ink bg-surface p-5 shadow-[4px_4px_0_var(--ink)] lg:sticky lg:top-24" data-reveal>
+        <div class="flex items-center gap-4">
+          <div class="flex size-20 shrink-0 flex-col justify-between rounded-xl border-2 border-ink bg-note p-2 text-ink" aria-hidden="true">
+            <span class="font-mono text-[10px] opacity-70" data-stack-number>—</span>
+            <span class="text-3xl leading-none font-extrabold tracking-tight" data-stack-symbol>?</span>
+          </div>
+          <div class="min-w-0">
+            <span class="block truncate font-bold" data-stack-name>Pilih elemen</span>
+            <span class="block text-xs text-muted" data-stack-group>klik salah satu chip</span>
+          </div>
+        </div>
+        <p class="hand mt-5 text-lg" aria-live="polite" data-stack-status>Semua project</p>
+        <ul class="mt-2">
           {
             projects.map((p) => (
               <li>
                 <a
                   href={`/projects/${p.id}`}
                   data-stack-project={p.id}
-                  class="flex items-center justify-between gap-3 rounded-md border-b border-dashed border-line px-1 py-2 text-sm transition-[opacity,color] duration-200 hover:text-accent data-[dim]:opacity-30 data-[hl]:font-semibold data-[hl]:text-accent"
+                  class="flex items-center justify-between gap-3 border-b border-dashed border-line px-1 py-2 text-sm transition-[opacity,color] duration-200 hover:text-accent data-[dim]:opacity-30 data-[hl]:font-semibold data-[hl]:text-accent"
                 >
                   <span>{p.data.title}</span>
                   <span class="shrink-0 font-mono text-[11px] text-muted">{p.data.category}</span>
@@ -164,7 +167,7 @@ const groups = Object.entries(profile.skills).map(([group, skills], g) => ({
             ))
           }
         </ul>
-      </div>
+      </aside>
     </div>
   </div>
 </section>
@@ -193,7 +196,7 @@ const groups = Object.entries(profile.skills).map(([group, skills], g) => ({
         tile.number.textContent = '—';
         tile.symbol.textContent = '?';
         tile.name.textContent = 'Pilih elemen';
-        tile.group.textContent = 'dari tabel di atas';
+        tile.group.textContent = 'klik salah satu chip';
         return;
       }
       const ids = new Set(chip.dataset.techProjects!.split(' ').filter(Boolean));
