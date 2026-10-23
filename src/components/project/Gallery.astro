@@ -1,0 +1,104 @@
+---
+import type { ImageMetadata } from 'astro';
+import { Image, getImage } from 'astro:assets';
+
+interface Props {
+  images: ImageMetadata[];
+  title: string;
+}
+
+const { images, title } = Astro.props;
+// Versi besar untuk lightbox, dioptimasi saat build
+const full = await Promise.all(images.map((src) => getImage({ src, width: Math.min(src.width, 1800) })));
+const items = images.map((src, i) => ({ src, full: full[i].src, alt: `${title}, screenshot ${i + 1}` }));
+---
+
+<section aria-labelledby="gallery-heading" class="mt-16" data-gallery>
+  <h2 id="gallery-heading" class="text-xl font-semibold tracking-tight">Screenshot</h2>
+  <ul class="mt-6 grid gap-3 sm:grid-cols-2">
+    {
+      items.map((item, i) => (
+        <li>
+          <button
+            type="button"
+            data-gallery-open={i}
+            data-full={item.full}
+            data-alt={item.alt}
+            class="group block w-full overflow-hidden rounded-lg border border-line bg-surface-2"
+            aria-label={`Perbesar ${item.alt}`}
+          >
+            <Image
+              src={item.src}
+              alt={item.alt}
+              width={720}
+              class="aspect-video w-full object-cover transition-transform duration-300 group-hover:scale-[1.02] motion-reduce:transition-none"
+            />
+          </button>
+        </li>
+      ))
+    }
+  </ul>
+
+  <dialog
+    data-lightbox
+    aria-label="Screenshot"
+    class="m-auto max-h-none max-w-none bg-transparent p-0 text-ink backdrop:bg-black/85"
+  >
+    <figure class="flex h-dvh w-screen flex-col items-center justify-center gap-3 p-4 sm:p-10">
+      <img data-lightbox-img alt="" class="max-h-[80vh] max-w-full rounded-lg object-contain" />
+      <figcaption class="flex items-center gap-4 font-mono text-xs text-white/80">
+        <button type="button" hidden={items.length < 2} data-lightbox-prev class="rounded-md px-3 py-2 hover:bg-white/10" aria-label="Sebelumnya">‹ prev</button>
+        <span data-lightbox-count></span>
+        <button type="button" hidden={items.length < 2} data-lightbox-next class="rounded-md px-3 py-2 hover:bg-white/10" aria-label="Berikutnya">next ›</button>
+      </figcaption>
+    </figure>
+    <button
+      type="button"
+      data-lightbox-close
+      class="fixed top-4 right-4 rounded-md px-3 py-2 font-mono text-sm text-white/80 hover:bg-white/10"
+      aria-label="Tutup"
+    >
+      Esc
+    </button>
+  </dialog>
+</section>
+
+<script>
+  import { onPageLoad } from '../../scripts/lifecycle';
+
+  onPageLoad(() => {
+    const root = document.querySelector<HTMLElement>('[data-gallery]');
+    if (!root) return;
+    const dialog = root.querySelector<HTMLDialogElement>('[data-lightbox]')!;
+    const img = root.querySelector<HTMLImageElement>('[data-lightbox-img]')!;
+    const count = root.querySelector<HTMLElement>('[data-lightbox-count]')!;
+    const thumbs = [...root.querySelectorAll<HTMLElement>('[data-gallery-open]')];
+    let index = 0;
+
+    const show = (i: number) => {
+      index = (i + thumbs.length) % thumbs.length;
+      img.src = thumbs[index].dataset.full!;
+      img.alt = thumbs[index].dataset.alt!;
+      count.textContent = `${index + 1} / ${thumbs.length}`;
+    };
+
+    root.addEventListener('click', (event) => {
+      const target = event.target as HTMLElement;
+      const thumb = target.closest<HTMLElement>('[data-gallery-open]');
+      if (thumb) {
+        show(Number(thumb.dataset.galleryOpen));
+        dialog.showModal();
+      } else if (target.closest('[data-lightbox-prev]')) show(index - 1);
+      else if (target.closest('[data-lightbox-next]')) show(index + 1);
+      else if (target.closest('[data-lightbox-close]') || target === dialog || target.tagName === 'FIGURE') dialog.close();
+    });
+
+    dialog.addEventListener('keydown', (event) => {
+      if (event.key === 'ArrowLeft') show(index - 1);
+      if (event.key === 'ArrowRight') show(index + 1);
+    });
+
+    // Kembalikan fokus ke thumbnail yang dibuka
+    dialog.addEventListener('close', () => thumbs[index]?.focus());
+  });
+</script>
