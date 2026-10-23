@@ -1,51 +1,65 @@
 ---
 import SectionHeading from '../SectionHeading.astro';
+import Doodle from '../Doodle.astro';
 import { profile } from '../../data/profile';
 ---
 
-<section id="experience" class="border-t border-line py-20 sm:py-28">
-  <div class="mx-auto w-full max-w-6xl px-4 sm:px-6">
-    <SectionHeading title="Pengalaman" />
-    <div class="relative max-w-3xl" data-timeline>
+<section id="experience" class="relative py-24 sm:py-32">
+  <div class="relative mx-auto grid w-full max-w-6xl gap-12 px-4 sm:px-6 lg:grid-cols-12 lg:gap-10">
+    <div class="lg:col-span-4">
+      <div class="lg:sticky lg:top-28">
+        <SectionHeading title="Pengalaman" doodle="sync" />
+        <Doodle name="server" class="bob hidden size-36 -rotate-6 text-pen/50 lg:block" stroke={2.5} />
+      </div>
+    </div>
+
+    <div class="relative lg:col-span-8" data-timeline>
       <!-- Track + progress yang terisi saat scroll -->
-      <span class="absolute top-2 bottom-2 left-[7px] w-px bg-line" aria-hidden="true"></span>
+      <span class="absolute top-2 bottom-2 left-[7px] w-0.5 bg-ink/15" aria-hidden="true"></span>
       <span
-        class="absolute top-2 bottom-2 left-[7px] w-px origin-top bg-accent"
+        class="absolute top-2 bottom-2 left-[7px] w-0.5 origin-top bg-accent"
         style="transform: scaleY(var(--progress, 1))"
         aria-hidden="true"
       ></span>
 
-    <ol class="flex flex-col gap-12 pl-9">
-      {
-        profile.experience.map((job) => (
-          <li class="relative" data-timeline-item data-reveal>
-            <span
-              class="absolute top-1.5 -left-9 size-[15px] rounded-full border-2 border-line bg-canvas transition-colors duration-300 data-[reached]:border-accent"
-              data-timeline-dot
-              data-reached
-              aria-hidden="true"
-            />
-            <p class="flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-xs text-muted sm:text-sm">
-              {job.period}
-              {job.active && <span class="rounded border border-accent/50 px-1.5 text-[11px] text-accent">aktif</span>}
-            </p>
-            <h3 class="mt-2 text-xl font-semibold tracking-tight">{job.role}</h3>
-            <p class="mt-1 text-muted">{job.company}</p>
-            <p class="mt-4 max-w-2xl leading-7 text-muted">{job.description}</p>
-            <ul class="mt-4 space-y-2 text-sm leading-6">
-              {job.points.map((point) => (
-                <li class="flex gap-3">
-                  <span class="font-mono text-accent" aria-hidden="true">
-                    +
-                  </span>
-                  <span>{point}</span>
-                </li>
-              ))}
-            </ul>
-          </li>
-        ))
-      }
-    </ol>
+      <ol class="flex flex-col gap-10 pl-9">
+        {
+          profile.experience.map((job) => (
+            <li class="relative" data-timeline-item data-reveal>
+              <span
+                class="absolute top-7 -left-9 size-[16px] rounded-full border-2 border-ink/30 bg-canvas transition-colors duration-300 data-[reached]:border-accent data-[reached]:bg-accent"
+                data-timeline-dot
+                data-reached
+                aria-hidden="true"
+              />
+              <div class="rounded-2xl border-2 border-ink bg-surface p-6 shadow-[4px_4px_0_var(--ink)] sm:p-8">
+                <p class="flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-xs text-muted sm:text-sm">
+                  {job.period}
+                  {job.active && (
+                    <span class="relative ml-2 px-2 font-hand text-base font-bold text-accent">
+                      aktif
+                      <Doodle name="circle" class="absolute -inset-x-1.5 -inset-y-1.5 h-[calc(100%+0.75rem)] w-[calc(100%+0.75rem)]" stroke={4} delay={0.4} />
+                    </span>
+                  )}
+                </p>
+                <h3 class="mt-2 text-2xl font-extrabold tracking-tight sm:text-3xl">{job.role}</h3>
+                <p class="mt-1 font-medium text-muted">{job.company}</p>
+                <p class="mt-4 leading-7 text-muted">{job.description}</p>
+                <ul class="mt-5 grid gap-x-6 gap-y-2.5 text-sm leading-6 sm:grid-cols-2">
+                  {job.points.map((point) => (
+                    <li class="flex gap-3">
+                      <span class="font-mono font-bold text-accent" aria-hidden="true">
+                        +
+                      </span>
+                      <span>{point}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </li>
+          ))
+        }
+      </ol>
     </div>
   </div>
 </section>

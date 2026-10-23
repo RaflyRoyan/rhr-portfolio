@@ -1,14 +1,31 @@
 ---
+import Doodle, { type DoodleName } from './Doodle.astro';
+
 interface Props {
   title: string;
-  /** Satu kalimat penjelas, tampil sebagai komentar kode di bawah judul. */
+  /** Satu kalimat penjelas, tampil sebagai catatan tulisan tangan di bawah judul. */
   note?: string;
+  /** Coretan kecil di samping judul. */
+  doodle?: DoodleName;
 }
 
-const { title, note } = Astro.props;
+const { title, note, doodle } = Astro.props;
 ---
 
-<div class="mb-10 max-w-2xl" data-reveal>
-  <h2 class="text-2xl font-semibold tracking-tight sm:text-3xl">{title}</h2>
-  {note && <p class="mt-3 font-mono text-sm text-muted"><span class="text-accent/70">//</span> {note}</p>}
+<div class="mb-12 max-w-2xl">
+  <div class="flex items-end gap-3" data-reveal>
+    <h2 class="relative text-3xl font-bold tracking-tight sm:text-4xl">
+      {title}
+      <Doodle name="underline" class="absolute -bottom-3 left-0 h-3 w-[min(100%,14rem)] text-pen" stroke={4} delay={0.25} />
+    </h2>
+    {doodle && <Doodle name={doodle} class="bob mb-1 size-9 shrink-0 text-pen sm:size-11" delay={0.5} />}
+  </div>
+  {
+    note && (
+      <p class="hand mt-6 flex items-start gap-2 text-lg sm:text-xl" data-reveal>
+        <Doodle name="arrow-right" class="mt-1.5 h-4 w-8 shrink-0" delay={0.6} />
+        <span class="inline-block -rotate-1">{note}</span>
+      </p>
+    )
+  }
 </div>

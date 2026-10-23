@@ -1,0 +1,152 @@
+---
+// Coretan tangan (SVG stroke). Setiap path tergambar saat masuk viewport lewat [data-draw]
+// (lihat global.css); filter #sketchy di BaseLayout membuat garisnya sedikit bergelombang.
+export type DoodleName = keyof typeof DOODLES;
+
+interface Props {
+  name: DoodleName;
+  class?: string;
+  /** Tebal garis dalam satuan viewBox. */
+  stroke?: number;
+  /** Jeda sebelum mulai menggambar, dalam detik. */
+  delay?: number;
+  /** false = tampil langsung tanpa animasi gambar. */
+  draw?: boolean;
+}
+
+const DOODLES = {
+  db: {
+    box: '0 0 100 100',
+    paths: [
+      'M20 25 C20 13 80 13 80 25 C80 37 20 37 20 25 Z',
+      'M20 25 V75 C20 87 80 87 80 75 V25',
+      'M20 50 C20 62 80 62 80 50',
+    ],
+  },
+  chart: {
+    box: '0 0 100 100',
+    paths: [
+      'M14 12 V86 H92',
+      'M24 86 V64 H34 V86',
+      'M41 86 V50 H51 V86',
+      'M58 86 V57 H68 V86',
+      'M75 86 V34 H85 V86',
+      'M20 52 L44 36 L60 44 L86 14',
+      'M76 13 L87 13 L87 24',
+    ],
+  },
+  braces: {
+    box: '0 0 100 100',
+    paths: [
+      'M38 14 C27 14 30 26 30 36 C30 45 24 48 18 50 C24 52 30 55 30 64 C30 74 27 86 38 86',
+      'M62 14 C73 14 70 26 70 36 C70 45 76 48 82 50 C76 52 70 55 70 64 C70 74 73 86 62 86',
+    ],
+  },
+  server: {
+    box: '0 0 100 100',
+    paths: ['M14 16 H86 V42 H14 Z', 'M14 52 H86 V78 H14 Z', 'M25 29 h1', 'M25 65 h1', 'M48 29 H74', 'M48 65 H74', 'M30 78 V90', 'M70 78 V90'],
+  },
+  sync: {
+    box: '0 0 100 100',
+    paths: ['M80 42 C76 24 62 16 48 16 C34 16 24 24 20 34', 'M18 20 L20 35 L34 33', 'M20 58 C24 76 38 84 52 84 C66 84 76 76 80 66', 'M82 80 L80 65 L66 67'],
+  },
+  plug: {
+    box: '0 0 100 100',
+    paths: [
+      'M32 14 V34',
+      'M52 14 V34',
+      'M20 34 H64 V50 C64 64 54 72 42 72 C30 72 20 64 20 50 Z',
+      'M42 72 C42 90 70 92 88 74',
+    ],
+  },
+  boxes: {
+    box: '0 0 100 100',
+    paths: ['M6 38 H38 V70 H6 Z', 'M6 50 H38', 'M62 38 H94 V70 H62 Z', 'M62 50 H94', 'M42 54 H58', 'M51 47 L58 54 L51 61'],
+  },
+  pin: {
+    box: '0 0 100 100',
+    paths: [
+      'M50 90 C36 68 24 56 24 40 C24 24 36 12 50 12 C64 12 76 24 76 40 C76 56 64 68 50 90 Z',
+      'M50 31 C56 31 59 35 59 40 C59 46 55 49 50 49 C44 49 41 45 41 40 C41 34 45 31 50 31 Z',
+    ],
+  },
+  star: {
+    box: '0 0 100 100',
+    paths: ['M50 8 L61 37 L92 39 L68 58 L76 89 L50 71 L24 89 L32 58 L8 39 L39 37 Z'],
+  },
+  sparkle: {
+    box: '0 0 100 100',
+    paths: ['M50 12 V88', 'M12 50 H88', 'M26 26 L38 38', 'M62 62 L74 74', 'M74 26 L62 38', 'M38 62 L26 74'],
+  },
+  coffee: {
+    box: '0 0 100 100',
+    paths: [
+      'M18 42 H68 V64 C68 78 58 86 43 86 C28 86 18 78 18 64 Z',
+      'M68 48 C84 46 86 66 68 66',
+      'M33 32 C28 24 38 20 33 10',
+      'M48 32 C43 24 53 20 48 10',
+    ],
+  },
+  magnifier: {
+    box: '0 0 100 100',
+    paths: ['M40 14 C55 14 66 25 66 40 C66 55 55 66 40 66 C25 66 14 55 14 40 C14 25 25 14 40 14 Z', 'M59 59 L86 86', 'M28 34 C30 28 34 25 40 24'],
+  },
+  pencil: {
+    box: '0 0 100 100',
+    paths: ['M18 82 L24 62 L70 16 L84 30 L38 76 Z', 'M62 24 L76 38', 'M24 62 L38 76', 'M18 82 L30 79'],
+  },
+  cap: {
+    box: '0 0 100 100',
+    paths: ['M8 40 L50 22 L92 40 L50 58 Z', 'M26 48 V68 C38 78 62 78 74 68 V48', 'M92 40 V64', 'M88 70 L92 62 L96 70 Z'],
+  },
+  check: {
+    box: '0 0 100 100',
+    paths: ['M14 54 L38 78 L88 20'],
+  },
+  plane: {
+    box: '0 0 100 100',
+    paths: ['M6 48 L94 10 L62 90 L46 58 Z', 'M46 58 L94 10', 'M46 58 L44 80 L55 68'],
+  },
+  'arrow-curve': {
+    box: '0 0 120 80',
+    paths: ['M112 10 C80 4 38 18 20 62', 'M10 48 L19 64 L36 57'],
+  },
+  'arrow-down': {
+    box: '0 0 60 80',
+    paths: ['M20 4 C38 22 8 42 30 70', 'M17 60 L30 72 L42 58'],
+  },
+  'arrow-right': {
+    box: '0 0 100 50',
+    paths: ['M4 30 C30 12 60 40 90 22', 'M76 14 L91 21 L82 35'],
+  },
+  underline: {
+    box: '0 0 200 20',
+    paths: ['M3 13 C30 4 52 18 82 10 S146 3 197 9'],
+  },
+  circle: {
+    box: '0 0 200 80',
+    paths: ['M104 6 C152 4 196 20 194 42 C192 66 140 76 96 74 C50 72 6 62 6 40 C6 18 52 6 118 11'],
+  },
+} as const;
+
+const { name, class: className, stroke = 3, delay = 0, draw = true } = Astro.props;
+const doodle = DOODLES[name];
+// Garis bawah & lingkaran mengikuti ukuran elemen yang dicoret, bukan rasio viewBox
+const stretch = name === 'underline' || name === 'circle';
+---
+
+<svg
+  viewBox={doodle.box}
+  preserveAspectRatio={stretch ? 'none' : undefined}
+  class:list={['doodle', className]}
+  fill="none"
+  stroke="currentColor"
+  stroke-width={stroke}
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  aria-hidden="true"
+  data-draw={draw ? '' : undefined}
+  style={delay ? `--draw-delay: ${delay}s` : undefined}
+>
+  {doodle.paths.map((d, i) => <path d={d} pathLength="1" style={`--i: ${i}`} />)}
+</svg>

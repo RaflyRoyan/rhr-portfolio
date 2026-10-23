@@ -2,31 +2,49 @@
 import type { CollectionEntry } from 'astro:content';
 import { Image } from 'astro:assets';
 import ProjectStatus from './ProjectStatus.astro';
+import Doodle, { type DoodleName } from './Doodle.astro';
 
 interface Props {
   project: CollectionEntry<'projects'>;
   size?: 'card' | 'page';
+  class?: string;
 }
 
-const { project, size = 'card' } = Astro.props;
-const { cover, title, status } = project.data;
+// Coretan pengganti gambar, per kategori project
+const CATEGORY_DOODLE: Record<CollectionEntry<'projects'>['data']['category'], DoodleName> = {
+  Backend: 'server',
+  Database: 'db',
+  Dashboard: 'chart',
+  Integration: 'plug',
+  Migration: 'boxes',
+  'Field Ops': 'pin',
+};
+
+const { project, size = 'card', class: className } = Astro.props;
+const { cover, title, status, category } = project.data;
 const name = `project-cover-${project.id}`;
 const height = size === 'page' ? 'h-36 sm:h-52' : 'h-24 sm:h-28';
 ---
 
 {
   cover ? (
-    <Image src={cover} alt={`Tampilan ${title}`} class:list={['w-full rounded-lg object-cover', height]} transition:name={name} />
+    <Image src={cover} alt={`Tampilan ${title}`} class:list={['w-full rounded-lg object-cover', height, className]} transition:name={name} />
   ) : (
     // Cover otomatis bila belum ada gambar: panel grid berisi path dan status project
     <div
-      class:list={['cover-grid relative w-full overflow-hidden rounded-lg border border-line bg-surface-2', height]}
+      class:list={['cover-grid relative w-full overflow-hidden rounded-lg border border-line bg-surface-2', height, className]}
       transition:name={name}
     >
       <span class="absolute top-3 left-3 font-mono text-xs text-muted" aria-hidden="true">~/projects/{project.id}</span>
       <span class="absolute bottom-3 left-3 rounded bg-surface px-1.5 py-0.5">
         <ProjectStatus status={status} />
       </span>
+      <Doodle
+        name={CATEGORY_DOODLE[category]}
+        class:list={['absolute top-1/2 right-5 -translate-y-1/2 rotate-[-4deg] text-pen', size === 'page' ? 'size-24 sm:size-36' : 'size-16 sm:size-20']}
+        stroke={3.5}
+        delay={0.2}
+      />
     </div>
   )
 }

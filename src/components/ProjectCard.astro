@@ -19,7 +19,7 @@ const rest = tech.length - shown.length;
   href={`/projects/${project.id}`}
   data-project={project.id}
   class:list={[
-    'group flex flex-col gap-4 rounded-xl border border-line bg-surface p-3 transition-[border-color,opacity] duration-300 hover:border-muted data-[dim]:opacity-35 data-[hl]:border-accent',
+    'group flex flex-col gap-4 rounded-2xl border-2 border-ink bg-surface p-3 transition-[translate,box-shadow,border-color,opacity] duration-300 hover:-translate-y-1 hover:shadow-[5px_5px_0_var(--ink)] data-[dim]:opacity-35 data-[hl]:border-accent',
     className,
   ]}
 >
@@ -29,7 +29,7 @@ const rest = tech.length - shown.length;
       <span class="font-mono text-xs text-muted">{category}</span>
       {cover && <ProjectStatus status={status} />}
     </div>
-    <h3 class="mt-2 text-lg font-semibold tracking-tight group-hover:text-accent" transition:name={`project-title-${project.id}`}>
+    <h3 class="mt-2 text-xl font-bold tracking-tight group-hover:text-accent" transition:name={`project-title-${project.id}`}>
       <span>{title}</span>
     </h3>
     <p class="mt-2 text-sm leading-6 text-muted">{summary}</p>

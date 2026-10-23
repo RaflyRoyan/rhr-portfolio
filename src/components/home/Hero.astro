@@ -1,5 +1,6 @@
 ---
 import CodeCard from './CodeCard.astro';
+import Doodle from '../Doodle.astro';
 import { profile } from '../../data/profile';
 
 interface Props {
@@ -7,52 +8,105 @@ interface Props {
 }
 
 const { stats } = Astro.props;
+const words = profile.name.split(' ');
+const nameLines = [words.slice(0, 2).join(' '), words.slice(2).join(' ')].filter(Boolean);
+const skills = Object.values(profile.skills).flat();
+const button =
+  'rounded-lg border-2 border-ink px-5 py-3 text-sm font-semibold shadow-[3px_3px_0_var(--ink)] transition-[translate,box-shadow] hover:-translate-y-0.5 hover:shadow-[5px_5px_0_var(--ink)] active:translate-y-0 active:shadow-[1px_1px_0_var(--ink)]';
 ---
 
-<section id="top" class="mx-auto grid w-full max-w-6xl gap-12 px-4 pt-14 pb-20 sm:px-6 sm:pt-20 lg:grid-cols-[1.05fr_1fr] lg:items-center lg:gap-16 lg:pt-24 lg:pb-28">
-  <div>
-    <p class="inline-flex items-center gap-2 font-mono text-xs text-muted sm:text-sm">
-      <span class="size-2 rounded-full bg-accent" aria-hidden="true"></span>
-      {profile.currentPosition}
-    </p>
-    <h1 class="mt-6 text-4xl leading-[1.05] font-semibold tracking-tight text-balance sm:text-5xl lg:text-6xl">
-      {profile.name}
-    </h1>
-    <p class="mt-5 text-lg text-ink sm:text-xl">
-      {profile.title}, {profile.tagline}
-    </p>
-    <p class="mt-4 max-w-xl leading-7 text-muted">{profile.bio.short}</p>
-
-    <div class="mt-8 flex flex-wrap gap-3">
-      <a
-        href="#projects"
-        class="rounded-md bg-accent px-5 py-2.5 text-sm font-medium text-accent-ink transition-opacity hover:opacity-90"
-      >
-        Lihat project
-      </a>
-      <a
-        href="#contact"
-        class="rounded-md border border-line px-5 py-2.5 text-sm font-medium transition-colors hover:border-muted"
-      >
-        Hubungi saya
-      </a>
+<section id="top" class="relative">
+  <div class="relative mx-auto w-full max-w-6xl px-4 pt-12 pb-20 sm:px-6 sm:pt-16 lg:pt-20 lg:pb-28">
+    <div class="flex flex-wrap items-center justify-between gap-4">
+      <p class="inline-flex items-center gap-2 rounded-full border-2 border-ink bg-surface px-3.5 py-1.5 text-xs font-semibold sm:text-sm">
+        <span class="relative flex size-2">
+          <span class="absolute inline-flex size-full animate-ping rounded-full bg-accent opacity-60 motion-reduce:hidden"></span>
+          <span class="relative inline-flex size-2 rounded-full bg-accent"></span>
+        </span>
+        {profile.currentPosition}
+      </p>
+      <p class="font-mono text-xs text-muted sm:text-sm">{profile.location}</p>
     </div>
 
-    <ul class="mt-10 flex flex-wrap gap-2" aria-label="Ringkasan">
-      {
-        stats.map(({ value, label }) => (
-          <li class="rounded-full border border-line bg-surface px-3 py-1.5 font-mono text-xs sm:text-sm">
-            <span class="text-accent tabular-nums" data-count={value}>
-              {value}
-            </span>{' '}
-            <span class="text-muted">{label}</span>
-          </li>
-        ))
-      }
-    </ul>
+    <!-- Nama besar selebar halaman -->
+    <div class="relative mt-10 sm:mt-14">
+      <p class="hand absolute -top-8 left-1 -rotate-3 text-xl sm:-top-9 sm:text-2xl" aria-hidden="true">halo, saya</p>
+      <h1 class="text-[clamp(3.1rem,11.5vw,9.5rem)] leading-[0.88] font-extrabold tracking-[-0.045em]">
+        {
+          nameLines.map((line, i) =>
+            i === nameLines.length - 1 ? (
+              <span class="block">
+                <span class="highlight" data-draw style="--draw-delay: 0.35s">{line}</span>
+              </span>
+            ) : (
+              <span class="block">{line}</span>
+            ),
+          )
+        }
+      </h1>
+      <Doodle name="star" class="bob absolute top-2 right-0 hidden size-16 text-amber-400 [--bob-rot:10deg] md:block lg:size-24" stroke={4} delay={1} />
+      <Doodle name="sparkle" class="bob absolute right-28 bottom-4 hidden size-10 text-pen [--bob-delay:1.2s] lg:block" stroke={5} delay={1.3} />
+    </div>
+
+    <div class="mt-14 grid gap-12 lg:mt-16 lg:grid-cols-12 lg:gap-10">
+      <div class="lg:col-span-5">
+        <p class="text-xl font-bold sm:text-2xl">{profile.title}, {profile.tagline}</p>
+        <p class="mt-4 text-[1.0625rem] leading-7 text-muted">{profile.bio.short}</p>
+        <div class="mt-8 flex flex-wrap items-center gap-4">
+          <a href="#projects" class:list={[button, 'bg-accent text-accent-ink']}>Lihat project</a>
+          <a href="#contact" class:list={[button, 'bg-surface']}>Hubungi saya</a>
+        </div>
+      </div>
+
+      <ul class="grid grid-cols-3 gap-4 self-start lg:col-span-2 lg:grid-cols-1 lg:gap-6" aria-label="Ringkasan">
+        {
+          stats.map(({ value, label }, i) => (
+            <li class="relative border-t-2 border-dashed border-line pt-3">
+              <span class="hand block text-5xl leading-none font-bold tabular-nums" data-count={value}>
+                {value}
+              </span>
+              <span class="mt-1 block text-sm text-muted">{label}</span>
+              {i === 0 && (
+                <Doodle name="circle" class="absolute top-0 -left-3 h-16 w-20 text-pen/60" stroke={2.5} delay={1.6} />
+              )}
+            </li>
+          ))
+        }
+      </ul>
+
+      <div class="relative lg:col-span-5">
+        <div class="pointer-events-none absolute -top-12 right-4 flex items-end gap-1" aria-hidden="true">
+          <span class="hand inline-block -rotate-3 text-lg">profil saya, versi C#</span>
+          <Doodle name="arrow-down" class="h-10 w-7" delay={1.2} />
+        </div>
+        <Doodle name="db" class="bob absolute -bottom-10 -left-6 z-10 size-16 text-pen" delay={0.9} />
+        <Doodle name="braces" class="bob absolute -right-5 -bottom-8 z-10 size-14 text-accent [--bob-delay:1.5s]" delay={1.1} />
+        <div class="rotate-[1deg] transition-transform duration-500 hover:rotate-0">
+          <CodeCard />
+        </div>
+      </div>
+    </div>
   </div>
 
-  <CodeCard />
+  <!-- Pita teknologi berjalan -->
+  <div class="relative -rotate-1 border-y-2 border-ink bg-ink py-4 text-canvas">
+    <div class="overflow-hidden">
+      <div class="marquee">
+        {
+          [0, 1].map((copy) => (
+            <ul class="flex shrink-0 items-center" aria-hidden={copy === 1 ? 'true' : undefined} aria-label={copy === 0 ? 'Teknologi' : undefined}>
+              {skills.map((skill) => (
+                <li class="flex items-center gap-6 pr-6 text-lg font-bold whitespace-nowrap sm:text-xl">
+                  {skill}
+                  <span class="text-hl" aria-hidden="true">✳</span>
+                </li>
+              ))}
+            </ul>
+          ))
+        }
+      </div>
+    </div>
+  </div>
 </section>
 
 <script>

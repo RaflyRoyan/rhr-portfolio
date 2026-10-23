@@ -1,8 +1,8 @@
-/** Balik tema dan simpan pilihan di localStorage. */
+/** Balik tema dan simpan pilihan di sessionStorage (kunjungan berikutnya kembali terang). */
 export function toggleTheme() {
   const dark = !document.documentElement.classList.contains('dark');
   document.documentElement.classList.toggle('dark', dark);
   try {
-    localStorage.setItem('theme', dark ? 'dark' : 'light');
+    sessionStorage.setItem('rhr-theme', dark ? 'dark' : 'light');
   } catch {}
 }

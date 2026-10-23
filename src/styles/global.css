@@ -4,8 +4,9 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-  --font-sans: 'Inter Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-sans: 'Bricolage Grotesque Variable', ui-sans-serif, system-ui, sans-serif;
   --font-mono: 'JetBrains Mono Variable', ui-monospace, SFMono-Regular, monospace;
+  --font-hand: 'Kalam', 'Comic Sans MS', cursive;
 }
 
 /* Token warna; nilai berganti antara light dan dark */
@@ -18,17 +19,30 @@
   --color-muted: var(--muted);
   --color-accent: var(--accent);
   --color-accent-ink: var(--accent-ink);
+  --color-pen: var(--pen);
+  --color-hl: var(--hl);
+  --color-note: var(--note);
+  --color-pen-soft: var(--pen-soft);
+  --color-accent-soft: var(--accent-soft);
 }
 
 :root {
-  --canvas: #f4f7f8;
+  --canvas: #f6f8fb;
   --surface: #ffffff;
-  --surface-2: #eaf0f2;
-  --line: #d4dde2;
-  --ink: #0e1a22;
-  --muted: #55677a;
+  --surface-2: #edf1f6;
+  --line: #d3dbe5;
+  --ink: #16202c;
+  --muted: #566476;
   --accent: #0a8f67;
   --accent-ink: #ffffff;
+
+  /* Buku catatan: grid kertas, tinta pena, stabilo, sticky note */
+  --grid: #e4eaf2;
+  --pen: #2f5bd3;
+  --hl: #ffe45c;
+  --note: #fff3a6;
+  --pen-soft: #e2e9fb;
+  --accent-soft: #d9f2e8;
 
   /* Syntax highlighting */
   --tok-kw: #0a8f67;
@@ -49,6 +63,13 @@
   --muted: #8696a5;
   --accent: #3dd6a3;
   --accent-ink: #062a1e;
+
+  --grid: #18222b;
+  --pen: #8fb0ff;
+  --hl: rgb(255 214 10 / 0.32);
+  --note: #2e2b1c;
+  --pen-soft: #18223d;
+  --accent-soft: #10302a;
 
   --tok-kw: #3dd6a3;
   --tok-type: #8fbfe0;
@@ -74,6 +95,17 @@
   }
   body {
     @apply bg-canvas text-ink antialiased;
+    /* Kertas grid buku catatan */
+    background-image:
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size: 28px 28px;
+    background-position: -1px -1px;
+  }
+  h1,
+  h2,
+  h3 {
+    font-stretch: 90%;
   }
   ::selection {
     background: color-mix(in oklab, var(--accent) 30%, transparent);
@@ -97,28 +129,103 @@
   transform: none;
 }
 
-/* Spotlight: gradient mengikuti kursor (--mx/--my diisi JS) */
-.spotlight {
-  position: relative;
-  isolation: isolate;
+/* Coretan tangan: tiap path tergambar (stroke-dashoffset) saat [data-draw] terlihat */
+.doodle {
+  overflow: visible;
+  filter: url(#sketchy);
 }
-.spotlight::before {
+.js [data-draw] path {
+  stroke-dasharray: 1 2;
+  stroke-dashoffset: 1.05;
+  transition: stroke-dashoffset 0.9s cubic-bezier(0.6, 0.1, 0.3, 1);
+  transition-delay: calc(var(--draw-delay, 0s) + var(--i, 0) * 140ms);
+}
+.js [data-draw].is-visible path {
+  stroke-dashoffset: 0;
+}
+
+/* Stabilo: sapuan kuning di belakang teks */
+.highlight {
+  background: linear-gradient(transparent 58%, var(--hl) 58%, var(--hl) 90%, transparent 90%) no-repeat;
+  background-size: 100% 100%;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+  padding-inline: 0.08em;
+}
+.js .highlight[data-draw] {
+  background-size: 0% 100%;
+  transition: background-size 0.8s cubic-bezier(0.6, 0.1, 0.3, 1) var(--draw-delay, 0s);
+}
+.js .highlight[data-draw].is-visible {
+  background-size: 100% 100%;
+}
+
+/* Catatan tulisan tangan */
+.hand {
+  font-family: var(--font-hand);
+  color: var(--pen);
+  line-height: 1.25;
+}
+
+/* Sticky note dengan selotip */
+.sticky-note {
+  position: relative;
+  box-shadow:
+    0 1px 1px rgb(0 0 0 / 0.04),
+    0 14px 28px -18px rgb(40 30 0 / 0.45);
+}
+.sticky-note::before {
   content: '';
   position: absolute;
-  inset: 0;
-  z-index: -1;
-  border-radius: inherit;
-  background: radial-gradient(
-    420px circle at var(--mx, 50%) var(--my, 50%),
-    color-mix(in oklab, var(--accent) 14%, transparent),
-    transparent 65%
-  );
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  pointer-events: none;
+  top: -12px;
+  left: 50%;
+  width: 96px;
+  height: 24px;
+  translate: -50% 0;
+  rotate: -3deg;
+  background: color-mix(in oklab, var(--surface) 55%, transparent);
+  border-inline: 1px dashed color-mix(in oklab, var(--muted) 30%, transparent);
+  backdrop-filter: blur(1px);
 }
-.spotlight:hover::before {
+
+/* Jejak putus-putus: dibuka dari kiri ke kanan (dash tidak bisa pakai trik dashoffset) */
+.js .trail[data-reveal] {
   opacity: 1;
+  transform: none;
+  clip-path: inset(0 100% 0 0);
+  transition: clip-path 1.4s cubic-bezier(0.5, 0.1, 0.3, 1) 0.2s;
+}
+.js .trail[data-reveal].is-visible {
+  clip-path: inset(0 0 0 0);
+}
+
+/* Doodle yang melayang pelan */
+.bob {
+  animation: bob 6s ease-in-out infinite alternate;
+  animation-delay: var(--bob-delay, 0s);
+}
+@keyframes bob {
+  from {
+    transform: translateY(0) rotate(var(--bob-rot, 0deg));
+  }
+  to {
+    transform: translateY(-8px) rotate(calc(var(--bob-rot, 0deg) * -1));
+  }
+}
+
+/* Pita teknologi berjalan; isi diduplikasi supaya loop mulus di -50% */
+.marquee {
+  display: flex;
+  width: max-content;
+  animation: marquee 38s linear infinite;
+}
+.marquee:hover {
+  animation-play-state: paused;
+}
+@keyframes marquee {
+  to {
+    transform: translateX(-50%);
+  }
 }
 
 /* Syntax highlighting kartu kode */
@@ -173,10 +280,21 @@
     transition: none;
   }
   .caret,
-  .enter {
+  .enter,
+  .bob,
+  .marquee {
     animation: none;
   }
-  .spotlight::before {
+  .js [data-draw] path {
+    stroke-dashoffset: 0;
+    transition: none;
+  }
+  .js .highlight[data-draw] {
+    background-size: 100% 100%;
+    transition: none;
+  }
+  .js .trail[data-reveal] {
+    clip-path: none;
     transition: none;
   }
 }
