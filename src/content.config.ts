@@ -2,7 +2,7 @@ import { defineCollection, reference } from 'astro:content';
 import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
 
-export const PROJECT_CATEGORIES = ['Backend', 'Database', 'Dashboard', 'Integration', 'Migration', 'Field Ops'] as const;
+export const PROJECT_CATEGORIES = ['Backend', 'Database', 'Dashboard', 'Monitoring System', 'Integration', 'Migration', 'Field Ops'] as const;
 export const PROJECT_STATUSES = ['live', 'in-progress', 'archived'] as const;
 export const UPDATE_CATEGORIES = ['Backend', 'Database', 'Dashboard', 'Tools'] as const;
 

@@ -7,7 +7,7 @@ role: Backend Developer # TODO: verifikasi
 period: Okt 2026 – sekarang # TODO: verifikasi (tanggal mulai)
 status: in-progress
 featured: false
-order: 6
+order: 7
 tech:
   - C# WinForms
   - Dapper

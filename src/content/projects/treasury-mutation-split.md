@@ -7,7 +7,7 @@ role: Backend Developer # TODO: verifikasi
 period: Sep 2026 # TODO: verifikasi (diambil dari tanggal update di situs lama)
 status: live # TODO: verifikasi
 featured: false
-order: 2
+order: 3
 tech:
   - C#
   - .NET

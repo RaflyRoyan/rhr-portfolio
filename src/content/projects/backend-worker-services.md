@@ -7,7 +7,7 @@ role: Backend Developer # TODO: verifikasi
 period: 2025 – sekarang # TODO: verifikasi
 status: live # TODO: verifikasi
 featured: false
-order: 5
+order: 6
 tech:
   - C#
   - .NET Background Services

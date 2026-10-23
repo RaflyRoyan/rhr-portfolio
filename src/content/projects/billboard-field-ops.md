@@ -7,7 +7,7 @@ role: Backend Developer # TODO: verifikasi
 period: 2026 – sekarang # TODO: verifikasi
 status: live # TODO: verifikasi
 featured: false
-order: 7
+order: 8
 tech:
   - ASP.NET Core MVC
   - C#
