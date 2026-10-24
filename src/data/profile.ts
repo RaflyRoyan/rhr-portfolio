@@ -28,22 +28,42 @@ export const profile = {
     short:
       'Backend developer yang berfokus pada performa, integritas data, dan stabilitas sistem jangka panjang. Saya membangun sistem monitoring pendapatan daerah, transaksi bendahara, dan layanan wajib pajak menggunakan .NET & Oracle Database.',
     summary:
-      'Saya adalah seorang Backend Developer yang berfokus pada pengembangan sistem berbasis data dengan kompleksitas tinggi, khususnya menggunakan teknologi .NET (C#) dan Oracle Database. Dalam pekerjaan sehari-hari, saya terbiasa menangani sistem yang membutuhkan performa tinggi sekaligus akurasi data yang sangat ketat — seperti sistem transaksi dan pelaporan berskala besar.',
+      'Saya Backend Developer di Bapenda Kota Surabaya yang membangun sistem pajak dan pendapatan daerah dengan .NET (C#) dan Oracle Database. Mulai dari platform monitoring pendapatan yang dipakai dinas dan UPTB, sistem administrasi pajak generasi baru, portal wajib pajak dan petugas lapangan, sampai aplikasi bendahara penerimaan.',
     approach:
-      'Saya memiliki pendekatan yang sistematis dalam menyelesaikan masalah, terutama dalam analisis error, debugging mendalam, dan optimasi query database.',
+      'Sebagian besar pekerjaan saya ada di balik layar: worker yang menyinkronkan data dari banyak database dan API, view serta materialized view Oracle untuk dashboard, rekonsiliasi mutasi bank, dan migrasi data dari sistem lama. Saya suka memecah proses berat menjadi langkah yang transaksional, bisa diulang, dan bisa dipantau.',
     production:
-      'Terbiasa bekerja langsung di lingkungan production, di mana setiap perubahan harus dilakukan dengan hati-hati dan terukur untuk menjaga stabilitas sistem.',
+      'Sistem yang saya pegang menyentuh uang dan data wajib pajak secara langsung, mulai dari pembayaran VA/QRIS, status pelunasan real-time, sampai penerbitan ketetapan. Karena itu setiap perubahan di production saya kerjakan dengan hati-hati dan terukur.',
     professional:
       'Backend Developer yang berfokus pada pengembangan aplikasi enterprise menggunakan C#, .NET / ASP.NET Core, Oracle Database, EF Core, dan Dapper. Berpengalaman membangun dan mengembangkan sistem monitoring, transaksi, pembayaran, integrasi data, migrasi data, dan reporting dengan volume data besar.',
   },
 
   services: [
-    { title: 'Backend Development', description: 'Aplikasi backend C# / .NET, ASP.NET Core MVC, dan background worker service untuk proses data terjadwal.' },
-    { title: 'Database & Data Processing', description: 'Query Oracle kompleks (CTE, join, anti-join), materialized view, validasi, cleansing, dan optimasi performa.' },
-    { title: 'Data Synchronization', description: 'Sinkronisasi data antar sistem — tanpa data hilang, tanpa duplikasi, dan konsisten antar tabel.' },
-    { title: 'Monitoring Dashboards', description: 'Dashboard realisasi pendapatan, profil objek pajak, dan kontrol PBB yang responsif dan mudah dibaca.' },
-    { title: 'Payment & Integration', description: 'Integrasi Virtual Account, QRIS, dan pembayaran, REST API, serta database link Oracle — termasuk SKPD/SSPD dan monitoring status transaksi.' },
-    { title: 'Data Migration', description: 'Migrasi data historis dalam jumlah besar menggunakan Dapper, EF Core, dan Oracle dengan batch & parallel processing, progress monitoring, dan logging.' },
+    {
+      title: 'Aplikasi Web & API .NET',
+      description:
+        'Back-office, portal wajib pajak, dan REST API ber-JWT dengan ASP.NET Core MVC/Web API. Aturan bisnis disimpan di library domain bersama, lengkap dengan workflow approval berjenjang dan laporan PDF DevExpress.',
+    },
+    {
+      title: 'Database Oracle',
+      description: 'View dan materialized view untuk agregasi dashboard, query lintas database link, EF Core + Dapper di banyak DbContext, serta optimasi query.',
+    },
+    {
+      title: 'Worker & Sinkronisasi Data',
+      description: 'Worker .NET terjadwal yang menyinkronkan data pajak dari banyak database dan API, dengan upsert transaksional, retry, dan status run yang bisa dipantau.',
+    },
+    {
+      title: 'Dashboard Monitoring',
+      description: 'Dashboard realisasi pendapatan dan pengawasan PBJT, PBB, reklame, serta parkir. Data live CCTV dan transaksi parkir digital dialirkan lewat Server-Sent Events.',
+    },
+    {
+      title: 'Pembayaran & Integrasi',
+      description:
+        'Virtual Account dan QRIS (termasuk tagihan gabungan), cek pelunasan real-time, rekonsiliasi mutasi bank, API mobile, SignalR, serta notifikasi WhatsApp dan email.',
+    },
+    {
+      title: 'Migrasi Data',
+      description: 'Memindahkan data dari Oracle legacy ke sistem baru, termasuk foto BLOB, dengan proses bertahap yang idempoten, log error per baris, dan retry koneksi.',
+    },
   ],
 
   experience: [
@@ -53,15 +73,16 @@ export const profile = {
       period: 'Juni 2025 — Sekarang',
       active: true,
       description:
-        'Bertanggung jawab dalam pengembangan dan pemeliharaan sistem backend berbasis .NET serta pengelolaan database Oracle. Terlibat dalam sistem pengolahan data transaksi, monitoring pendapatan daerah, dan sinkronisasi antar sistem berskala besar.',
+        'Mengembangkan dan memelihara sistem pajak dan pendapatan daerah berbasis .NET dan Oracle: web back-office, portal wajib pajak, REST API untuk aplikasi mobile, worker sinkronisasi data, dan tool migrasi. Bekerja full-stack, dari query database sampai tampilan yang dipakai petugas.',
       points: [
-        'Mengembangkan backend service menggunakan C# (.NET) & EF Core',
-        'Mengelola dan mengoptimasi query serta materialized view Oracle',
-        'Membangun sistem sinkronisasi data antar platform',
-        'Mengembangkan modul MonPD, Bendahara, dan layanan wajib pajak',
-        'Melakukan troubleshooting pada sistem production',
-        'Integrasi VA, QRIS, dan pembayaran, termasuk SKPD/SSPD serta monitoring status transaksi',
-        'Migrasi data historis dalam jumlah besar dengan batch & parallel processing',
+        'Membangun hampir seluruh modul MonPD Reborn V2 (web dan API), platform monitoring pendapatan yang dipakai dinas, UPTB 1–5, dan beberapa OPD',
+        'Mengembangkan Surabaya Tax Next Gen: workflow approval MyTask, NPWPD otomatis multi-kanal, API mobile petugas, dan auto-assign task lapangan',
+        'Membangun portal petugas lapangan di SurabayaTax WP: BAP reklame dan hiburan, penagihan, serta pelunasan VA/QRIS real-time lewat SSE',
+        'Membangun worker .NET (Background Service MonPD dan MonPDSync) yang menyinkronkan data pajak dari banyak database Oracle dan REST API',
+        'Mengembangkan Sistem Bendahara Penerimaan: split dan rekonsiliasi parkir digital QRIS dari mutasi bank, serta BAP OPS dengan Virtual Account',
+        'Merancang view dan materialized view Oracle serta query lintas database link untuk agregasi dashboard',
+        'Membangun REST API ber-JWT untuk aplikasi mobile parkir digital, reklame, dan petugas lapangan',
+        'Memigrasikan data pajak reklame dari Oracle legacy ke sistem baru, termasuk foto survey BLOB',
       ],
     },
     {
@@ -108,7 +129,7 @@ export const profile = {
     Backend: ['C#', '.NET', 'ASP.NET Core MVC/Razor', 'Background Services'],
     Database: ['Oracle SQL', 'PL/SQL', 'Entity Framework Core', 'Dapper', 'Materialized View', 'Query Optimization'],
     Frontend: ['JavaScript', 'jQuery', 'AJAX', 'DevExtreme', 'Bootstrap 5', 'Tailwind CSS', 'Chart.js'],
-    Integration: ['REST API', 'Database link', 'Payment / QRIS / VA', 'SSE (Server-Sent Events)', 'Payment callback'],
+    Integration: ['REST API', 'Database link', 'Payment / QRIS / VA', 'SSE (Server-Sent Events)'],
     Desktop: ['C# WinForms'],
     Tools: ['Git', 'Visual Studio', 'Oracle tools'],
   } as Record<string, string[]>,
