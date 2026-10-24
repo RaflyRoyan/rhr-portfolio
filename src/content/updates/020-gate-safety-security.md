@@ -8,6 +8,7 @@ tech:
   - "JWT"
   - "DevExtreme"
 summary: "Porting modul master, registrasi, induksi online, izin kerja, dan pelanggaran ke pola library bersama, API dengan login JWT, serta frontend induksi berbasis DevExtreme."
+relatedProject: gate-safety-security-system
 ---
 
 - Refactor modul master ke pola `BaseMaster` + `IMaster` agar seragam

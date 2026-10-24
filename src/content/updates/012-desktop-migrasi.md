@@ -8,7 +8,7 @@ tech:
   - "EF Core"
   - "Oracle"
 summary: "Aplikasi C# WinForms untuk migrasi data reklame historis, termasuk foto survey. Sedang berjalan."
-relatedProject: data-migration-system
+relatedProject: migrasi-data-pajak-reklame
 ---
 
 - Migrasi data reklame historis: Permohonan, NOR, NLOR, Survey, Survey Terbatas, SKPD, Realisasi, dan Foto Survey

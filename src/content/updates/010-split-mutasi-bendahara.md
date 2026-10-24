@@ -6,6 +6,6 @@ tech:
   - "C#"
   - "EF Core"
 summary: "Logika pemecahan mutasi rekening bank (kredit & debit) per periode, pemetaan rekening ke objek pajak, perhitungan total mutasi, dan update status transfer."
-relatedProject: treasury-mutation-split
+relatedProject: sistem-bendahara-penerimaan
 ---
 
