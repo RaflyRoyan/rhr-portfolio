@@ -9,6 +9,7 @@ import TechStack from '../components/home/TechStack.astro';
 import Updates from '../components/home/Updates.astro';
 import Education from '../components/home/Education.astro';
 import Contact from '../components/home/Contact.astro';
+import InkTrail from '../components/home/InkTrail.astro';
 import { getProjects, getUpdates } from '../lib/collections';
 import { profile } from '../data/profile';
 
@@ -23,13 +24,16 @@ const stats = [
 ---
 
 <BaseLayout>
-  <Hero stats={stats} />
-  <About />
-  <Services />
-  <FeaturedProjects projects={projects} />
-  <Experience />
-  <TechStack projects={projects} />
-  <Updates updates={updates} />
-  <Education />
-  <Contact />
+  <div class="relative">
+    <InkTrail />
+    <Hero stats={stats} />
+    <About />
+    <Services />
+    <FeaturedProjects projects={projects} />
+    <Experience />
+    <TechStack projects={projects} />
+    <Updates updates={updates} />
+    <Education />
+    <Contact />
+  </div>
 </BaseLayout>

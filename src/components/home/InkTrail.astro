@@ -1,0 +1,154 @@
+---
+// Garis tinta di margin kiri halaman yang tergambar mengikuti scroll, dengan mata pena di ujungnya.
+// Membuat ikal kecil di awal tiap section dan ikal ganda di #projects. Path dibangun di client
+// karena bergantung pada tinggi section yang sebenarnya.
+---
+
+<div class="pointer-events-none absolute inset-0 z-30 hidden overflow-hidden md:block" aria-hidden="true" data-ink-trail>
+  <svg class="absolute inset-0 h-full w-full">
+    <path class="ink-path" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-ink-path></path>
+    <circle class="ink-nib" r="4" data-ink-nib></circle>
+  </svg>
+</div>
+
+<script>
+  import { onPageLoad, prefersReducedMotion } from '../../scripts/lifecycle';
+
+  onPageLoad(() => {
+    const wrap = document.querySelector<HTMLElement>('[data-ink-trail]');
+    const path = wrap?.querySelector<SVGPathElement>('[data-ink-path]');
+    const nib = wrap?.querySelector<SVGCircleElement>('[data-ink-nib]');
+    const host = wrap?.parentElement;
+    if (!wrap || !path || !nib || !host) return;
+
+    const reduced = prefersReducedMotion();
+    let length = 0;
+    // Sampel (panjang, y maksimum sejauh ini) untuk memetakan posisi scroll ke panjang garis
+    let samples: { len: number; y: number }[] = [];
+    let drawn = 0;
+    let target = 0;
+    let frame = 0;
+
+    const loop = (x: number, y: number, r: number) =>
+      `C ${x} ${y + r} ${x + 2 * r} ${y + r} ${x + 2 * r} ${y - 0.2 * r} ` +
+      `C ${x + 2 * r} ${y - 1.4 * r} ${x + 0.6 * r} ${y - 1.4 * r} ${x + 0.4 * r} ${y - 0.2 * r} ` +
+      `C ${x + 0.2 * r} ${y + r} ${x} ${y + 1.6 * r} ${x} ${y + 2.6 * r} `;
+
+    const build = () => {
+      const width = host.clientWidth;
+      const height = host.scrollHeight;
+      // Tengah margin kiri: max-w-6xl (1152px) + padding 24px
+      const x = Math.round((Math.max((width - 1152) / 2, 0) + 24) / 2);
+      const amp = Math.min(7, x * 0.35);
+      // Ikal sejajar judul section (h2), atau sedikit di bawah tepi atas section bila tidak ada judul
+      const hostTop = host.getBoundingClientRect().top;
+      const marks = [...host.querySelectorAll<HTMLElement>(':scope > section')].map((s) => {
+        const heading = s.querySelector('h2')?.getBoundingClientRect();
+        return {
+          y: heading ? heading.top - hostTop + heading.height / 2 - 18 : s.offsetTop + 104,
+          peak: s.id === 'projects',
+        };
+      });
+
+      let y = 150;
+      let d = `M ${x} ${y} `;
+      let side = 1;
+      const wave = (to: number) => {
+        while (to - y > 40) {
+          const h = Math.min(260, to - y);
+          d += `C ${x + amp * side} ${y + h / 3} ${x + amp * side} ${y + (2 * h) / 3} ${x} ${y + h} `;
+          y += h;
+          side = -side;
+        }
+      };
+      for (const mark of marks.slice(1)) {
+        wave(mark.y);
+        const r = mark.peak ? 16 : 9;
+        d += loop(x, y, r);
+        y += 2.6 * r;
+        if (mark.peak) {
+          d += loop(x, y, r * 0.7);
+          y += 2.6 * r * 0.7;
+        }
+      }
+      wave(height - 120);
+      d += loop(x, y, 12);
+
+      path.setAttribute('d', d);
+      length = path.getTotalLength();
+      path.style.strokeDasharray = `${length} ${length}`;
+
+      samples = [];
+      let maxY = 0;
+      for (let len = 0; len <= length; len += 6) {
+        maxY = Math.max(maxY, path.getPointAtLength(len).y);
+        samples.push({ len, y: maxY });
+      }
+    };
+
+    // Panjang garis untuk titik vertikal tertentu (pencarian biner pada y monoton)
+    const lengthAt = (y: number) => {
+      let lo = 0;
+      let hi = samples.length - 1;
+      if (hi < 0 || y <= samples[0].y) return 0;
+      if (y >= samples[hi].y) return length;
+      while (lo < hi) {
+        const mid = (lo + hi) >> 1;
+        if (samples[mid].y < y) lo = mid + 1;
+        else hi = mid;
+      }
+      return samples[lo].len;
+    };
+
+    const paint = () => {
+      path.style.strokeDashoffset = String(length - drawn);
+      const visible = drawn > 1 && drawn < length - 1;
+      nib.style.opacity = visible ? '1' : '0';
+      if (visible) {
+        const p = path.getPointAtLength(drawn);
+        nib.setAttribute('cx', String(p.x));
+        nib.setAttribute('cy', String(p.y));
+      }
+    };
+
+    const tick = () => {
+      frame = 0;
+      drawn += (target - drawn) * 0.14;
+      if (Math.abs(target - drawn) < 0.5) drawn = target;
+      paint();
+      if (drawn !== target) frame = requestAnimationFrame(tick);
+    };
+
+    const measure = () => {
+      const top = host.getBoundingClientRect().top;
+      target = lengthAt(window.innerHeight * 0.62 - top);
+      if (!frame) frame = requestAnimationFrame(tick);
+    };
+
+    const rebuild = () => {
+      // Disembunyikan di layar sempit (tidak ada margin); path tidak bisa diukur saat display: none
+      if (wrap.offsetWidth === 0) return;
+      build();
+      if (reduced) {
+        drawn = target = length;
+        paint();
+      } else measure();
+    };
+
+    rebuild();
+
+    let pending = 0;
+    const ro = new ResizeObserver(() => {
+      cancelAnimationFrame(pending);
+      pending = requestAnimationFrame(rebuild);
+    });
+    ro.observe(host);
+    if (!reduced) window.addEventListener('scroll', measure, { passive: true });
+    return () => {
+      ro.disconnect();
+      cancelAnimationFrame(pending);
+      cancelAnimationFrame(frame);
+      window.removeEventListener('scroll', measure);
+    };
+  });
+</script>

@@ -10,6 +10,8 @@ interface Props {
   stroke?: number;
   /** Jeda sebelum mulai menggambar, dalam detik. */
   delay?: number;
+  /** Kedalaman parallax di hero (lihat Hero.astro); makin besar makin terasa dekat. */
+  depth?: number;
   /** false = tampil langsung tanpa animasi gambar. */
   draw?: boolean;
 }
@@ -129,7 +131,7 @@ const DOODLES = {
   },
 } as const;
 
-const { name, class: className, stroke = 3, delay = 0, draw = true } = Astro.props;
+const { name, class: className, stroke = 3, delay = 0, draw = true, depth } = Astro.props;
 const doodle = DOODLES[name];
 // Garis bawah & lingkaran mengikuti ukuran elemen yang dicoret, bukan rasio viewBox
 const stretch = name === 'underline' || name === 'circle';
@@ -146,6 +148,7 @@ const stretch = name === 'underline' || name === 'circle';
   stroke-linejoin="round"
   aria-hidden="true"
   data-draw={draw ? '' : undefined}
+  data-depth={depth}
   style={delay ? `--draw-delay: ${delay}s` : undefined}
 >
   {doodle.paths.map((d, i) => <path d={d} pathLength="1" style={`--i: ${i}`} />)}

@@ -30,8 +30,8 @@ const button =
 
     <!-- Nama besar selebar halaman -->
     <div class="relative mt-10 sm:mt-14">
-      <p class="hand absolute -top-8 left-1 -rotate-3 text-xl sm:-top-9 sm:text-2xl" aria-hidden="true">halo, saya</p>
-      <h1 class="text-[clamp(3.1rem,11.5vw,9.5rem)] leading-[0.88] font-extrabold tracking-[-0.045em]">
+      <p class="hand absolute -top-8 left-1 -rotate-3 text-xl sm:-top-9 sm:text-2xl" aria-hidden="true" data-depth="0.12">halo, saya</p>
+      <h1 class="text-[clamp(3.1rem,11.5vw,9.5rem)] leading-[0.88] font-extrabold tracking-[-0.045em]" data-depth="-0.05">
         {
           nameLines.map((line, i) =>
             i === nameLines.length - 1 ? (
@@ -44,8 +44,8 @@ const button =
           )
         }
       </h1>
-      <Doodle name="star" class="bob absolute top-2 right-0 hidden size-16 text-amber-400 [--bob-rot:10deg] md:block lg:size-24" stroke={4} delay={1} />
-      <Doodle name="sparkle" class="bob absolute right-28 bottom-4 hidden size-10 text-pen [--bob-delay:1.2s] lg:block" stroke={5} delay={1.3} />
+      <Doodle name="star" class="bob absolute top-2 right-0 hidden size-16 text-amber-400 [--bob-rot:10deg] md:block lg:size-24" stroke={4} delay={1} depth={0.35} />
+      <Doodle name="sparkle" class="bob absolute right-28 bottom-4 hidden size-10 text-pen [--bob-delay:1.2s] lg:block" stroke={5} delay={1.3} depth={0.22} />
     </div>
 
     <div class="mt-14 grid gap-12 lg:mt-16 lg:grid-cols-12 lg:gap-10">
@@ -75,13 +75,13 @@ const button =
       </ul>
 
       <div class="relative lg:col-span-5">
-        <div class="pointer-events-none absolute -top-12 right-4 flex items-end gap-1" aria-hidden="true">
+        <div class="pointer-events-none absolute -top-12 right-4 flex items-end gap-1" aria-hidden="true" data-depth="0.18">
           <span class="hand inline-block -rotate-3 text-lg">profil saya, versi C#</span>
           <Doodle name="arrow-down" class="h-10 w-7" delay={1.2} />
         </div>
-        <Doodle name="db" class="bob absolute -bottom-10 -left-6 z-10 size-16 text-pen" delay={0.9} />
-        <Doodle name="braces" class="bob absolute -right-5 -bottom-8 z-10 size-14 text-accent [--bob-delay:1.5s]" delay={1.1} />
-        <div class="rotate-[1deg] transition-transform duration-500 hover:rotate-0">
+        <Doodle name="db" class="bob absolute -bottom-10 -left-6 z-10 size-16 text-pen" delay={0.9} depth={0.3} />
+        <Doodle name="braces" class="bob absolute -right-5 -bottom-8 z-10 size-14 text-accent [--bob-delay:1.5s]" delay={1.1} depth={0.42} />
+        <div class="rotate-[1deg] transition-[rotate] duration-500 hover:rotate-0" data-depth="0.1">
           <CodeCard />
         </div>
       </div>
@@ -90,7 +90,7 @@ const button =
 
   <!-- Pita teknologi berjalan -->
   <div class="relative -rotate-1 border-y-2 border-ink bg-ink py-4 text-canvas">
-    <div class="overflow-hidden">
+    <div class="overflow-hidden" data-marquee-band>
       <div class="marquee">
         {
           [0, 1].map((copy) => (
@@ -142,6 +142,81 @@ const button =
     return () => {
       io.disconnect();
       frames.forEach(cancelAnimationFrame);
+    };
+  });
+
+  // Kedalaman hero: tiap lapisan [data-depth] bergeser beda kecepatan saat scroll dan mengikuti kursor.
+  // Pita teknologi bereaksi ke kecepatan scroll: makin cepat, berbalik arah saat scroll ke atas.
+  // Memakai properti `translate` supaya tidak bentrok dengan animasi `transform` (.bob, .marquee).
+  onPageLoad(() => {
+    const hero = document.getElementById('top');
+    if (!hero || prefersReducedMotion()) return;
+    const layers = [...hero.querySelectorAll<HTMLElement | SVGElement>('[data-depth]')].map((el) => ({
+      el,
+      depth: Number(el.dataset.depth),
+    }));
+    const band = hero.querySelector<HTMLElement>('[data-marquee-band]');
+    const marquee = band?.querySelector<HTMLElement>('.marquee')?.getAnimations()[0];
+    const finePointer = window.matchMedia('(pointer: fine) and (min-width: 1024px)').matches;
+
+    let pointerX = 0;
+    let pointerY = 0;
+    let curX = 0;
+    let curY = 0;
+    let lastY = window.scrollY;
+    let lastT = performance.now();
+    let velocity = 0;
+    let rate = 1;
+    let frame = 0;
+
+    const tick = () => {
+      frame = 0;
+      const now = performance.now();
+      const y = window.scrollY;
+      const dt = Math.max(now - lastT, 1);
+      velocity += ((y - lastY) / dt - velocity) * 0.25;
+      lastY = y;
+      lastT = now;
+
+      curX += (pointerX - curX) * 0.08;
+      curY += (pointerY - curY) * 0.08;
+      if (y < hero.offsetHeight) {
+        for (const { el, depth } of layers) {
+          el.style.translate = `${(-curX * depth * 70).toFixed(2)}px ${(-y * depth - curY * depth * 50).toFixed(2)}px`;
+        }
+      }
+
+      const targetRate = 1 + Math.max(-4, Math.min(5, velocity * 2.2));
+      rate += (targetRate - rate) * 0.12;
+      if (marquee) marquee.playbackRate = rate;
+      if (band) band.style.transform = `skewX(${Math.max(-8, Math.min(8, -velocity * 3)).toFixed(2)}deg)`;
+
+      const settled = Math.abs(velocity) < 0.002 && Math.abs(rate - 1) < 0.01 && Math.abs(pointerX - curX) < 0.001 && Math.abs(pointerY - curY) < 0.001;
+      if (settled) {
+        velocity = 0;
+        if (marquee) marquee.playbackRate = 1;
+        if (band) band.style.transform = '';
+      } else frame = requestAnimationFrame(tick);
+    };
+    const wake = () => {
+      if (!frame) {
+        lastT = performance.now();
+        frame = requestAnimationFrame(tick);
+      }
+    };
+    const onPointer = (e: PointerEvent) => {
+      pointerX = e.clientX / window.innerWidth - 0.5;
+      pointerY = e.clientY / window.innerHeight - 0.5;
+      wake();
+    };
+
+    window.addEventListener('scroll', wake, { passive: true });
+    if (finePointer) window.addEventListener('pointermove', onPointer, { passive: true });
+    wake();
+    return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener('scroll', wake);
+      window.removeEventListener('pointermove', onPointer);
     };
   });
 </script>

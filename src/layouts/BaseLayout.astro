@@ -104,10 +104,18 @@ const ogImage = new URL(image, Astro.site);
     }
     const io = new IntersectionObserver(
       (entries) => {
+        // Elemen yang masuk bersamaan muncul bertahap; jeda dihapus setelahnya supaya hover tidak ikut tertunda
+        let order = 0;
         for (const entry of entries) {
           if (!entry.isIntersecting) continue;
-          entry.target.classList.add('is-visible');
-          io.unobserve(entry.target);
+          const el = entry.target as HTMLElement;
+          if (el.hasAttribute('data-reveal') && order > 0) {
+            el.style.setProperty('--reveal-delay', `${Math.min(order, 6) * 80}ms`);
+            el.addEventListener('transitionend', () => el.style.removeProperty('--reveal-delay'), { once: true });
+          }
+          if (el.hasAttribute('data-reveal')) order++;
+          el.classList.add('is-visible');
+          io.unobserve(el);
         }
       },
       { rootMargin: '0px 0px -10% 0px' },
