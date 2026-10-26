@@ -1,6 +1,6 @@
 ---
 // Garis tinta di margin kiri halaman yang tergambar mengikuti scroll, dengan mata pena di ujungnya.
-// Membuat ikal kecil di judul tiap section dan melompati #projects (di sana garis horizontal). Path dibangun di client
+// Membuat ikal kecil di judul tiap section dan melompati panel malam #projects. Path dibangun di client
 // karena bergantung pada tinggi section yang sebenarnya.
 ---
 
@@ -42,12 +42,12 @@
       const amp = Math.min(7, x * 0.35);
       // Ikal sejajar judul section (h2), atau sedikit di bawah tepi atas section bila tidak ada judul
       const hostTop = host.getBoundingClientRect().top;
-      // Section [data-pan] (Projects) dilompati: di sana garis tinta horizontal yang mengambil alih
+      // Section [data-ink-skip] (panel malam Projects) dilompati: pena terangkat lalu lanjut di bawahnya
       const marks = [...host.querySelectorAll<HTMLElement>(':scope > section')].map((s) => {
         const heading = s.querySelector('h2')?.getBoundingClientRect();
         return {
           y: heading ? heading.top - hostTop + heading.height / 2 - 18 : s.offsetTop + 104,
-          skip: s.hasAttribute('data-pan') ? { from: s.offsetTop, to: s.offsetTop + s.offsetHeight } : null,
+          skip: s.hasAttribute('data-ink-skip') ? { from: s.offsetTop, to: s.offsetTop + s.offsetHeight } : null,
         };
       });
 

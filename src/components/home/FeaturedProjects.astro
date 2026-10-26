@@ -11,40 +11,39 @@ interface Props {
 
 const { projects } = Astro.props;
 
-// Panel malam: section di-pin dan scroll vertikal menggeser lintasan kartu ke samping (lihat script).
-// Project featured jadi kartu lebar, sisanya kartu sempit; tiap kartu lebar diikuti dua kartu sempit.
+// Panel malam berisi grid project yang mengalir ke bawah.
+// Project featured jadi kartu selebar baris, tiap kartu lebar diikuti satu baris berisi tiga kartu kecil.
 const big = projects.filter((p) => p.data.featured);
 const small = projects.filter((p) => !p.data.featured);
 type Tile = { project: CollectionEntry<'projects'>; big: boolean };
 const tiles: Tile[] = [];
 big.forEach((project) => {
   tiles.push({ project, big: true });
-  tiles.push(...small.splice(0, 2).map((p) => ({ project: p, big: false })));
+  tiles.push(...small.splice(0, 3).map((p) => ({ project: p, big: false })));
 });
 tiles.push(...small.map((project) => ({ project, big: false })));
 ---
 
-<section id="projects" class="inverse relative" data-pan>
-  <div class="py-24 sm:py-32 pan:sticky pan:top-0 pan:flex pan:h-dvh pan:flex-col pan:justify-center pan:overflow-hidden pan:py-0 pan:pt-14" data-pan-stage>
-    <div class="mx-auto flex w-full max-w-6xl flex-wrap items-end justify-between gap-x-8 px-4 sm:px-6 pan:[&>div:first-child]:mb-6">
+<section id="projects" class="inverse relative" data-ink-skip>
+  <div class="py-24 sm:py-32">
+    <div class="mx-auto flex w-full max-w-6xl flex-wrap items-end justify-between gap-x-8 px-4 sm:px-6">
       <SectionHeading title="Project pilihan" doodle="star" note="Sistem internal Bapenda Kota Surabaya. Detail sensitif sengaja disamarkan." />
       <a
         href="/projects"
-        class="mb-12 rounded-full border border-ink/25 pan:mb-6 px-5 py-2.5 text-sm font-semibold transition-colors hover:border-ink hover:bg-ink hover:text-canvas"
+        class="mb-12 rounded-full border border-ink/25 px-5 py-2.5 text-sm font-semibold transition-colors hover:border-ink hover:bg-ink hover:text-canvas"
       >
         Semua project ({projects.length})
       </a>
     </div>
 
-    <div class="pan:overflow-visible" data-pan-viewport>
+    <div>
       <ol
-        class="mx-auto grid max-w-6xl grid-flow-dense gap-5 px-4 sm:grid-cols-2 sm:px-6 lg:grid-cols-3 pan:flex pan:max-w-none pan:px-[max(1.5rem,calc((100vw-72rem)/2+1.5rem))] pan:pt-4 pan:pb-4 pan:will-change-transform"
-        data-pan-track
+        class="mx-auto grid max-w-6xl grid-flow-dense gap-5 px-4 sm:grid-cols-2 sm:px-6 lg:grid-cols-3"
       >
         {
           tiles.map(({ project, big }) =>
             big ? (
-              <li class="flex sm:col-span-2 pan:w-[62rem] pan:shrink-0">
+              <li class="flex sm:col-span-2 lg:col-span-3" data-reveal>
                 <a
                   href={`/projects/${project.id}`}
                   class="sheet lift group relative grid w-full gap-6 rounded-3xl p-4 sm:grid-cols-[1.05fr_1fr] sm:gap-8 sm:p-6"
@@ -79,13 +78,13 @@ tiles.push(...small.map((project) => ({ project, big: false })));
                 </a>
               </li>
             ) : (
-              <li class="flex pan:w-[21rem] pan:shrink-0">
+              <li class="flex" data-reveal>
                 <ProjectCard project={project} class="w-full" />
               </li>
             ),
           )
         }
-        <li class="flex min-h-48 pan:w-[18rem] pan:shrink-0">
+        <li class="flex min-h-48" data-reveal>
           <a
             href="/projects"
             class="group flex w-full flex-col items-center justify-center gap-3 rounded-3xl border border-dashed border-ink/30 p-6 text-center transition-colors hover:border-ink hover:bg-surface"
@@ -97,89 +96,5 @@ tiles.push(...small.map((project) => ({ project, big: false })));
         </li>
       </ol>
     </div>
-
-    <!-- Garis tinta yang menyambung dari margin: tergambar sesuai geseran lintasan -->
-    <div class="mx-auto hidden w-full max-w-6xl px-6 pan:block" aria-hidden="true">
-      <svg class="h-6 w-full overflow-visible text-pen" viewBox="0 0 1000 24" preserveAspectRatio="none">
-        <path
-          class="pan-line"
-          d="M0 12 C120 4 200 20 320 12 S520 4 640 12 S860 20 1000 12"
-          pathLength="1"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          vector-effect="non-scaling-stroke"
-          data-pan-line></path>
-      </svg>
-    </div>
   </div>
 </section>
-
-<script>
-  import { onPageLoad } from '../../scripts/lifecycle';
-
-  // Pin + geser: tinggi section = 1 layar + jarak geser, posisi scroll di dalamnya jadi translateX lintasan
-  onPageLoad(() => {
-    const section = document.querySelector<HTMLElement>('[data-pan]');
-    const track = section?.querySelector<HTMLElement>('[data-pan-track]');
-    const viewport = section?.querySelector<HTMLElement>('[data-pan-viewport]');
-    const line = section?.querySelector<SVGPathElement>('[data-pan-line]');
-    if (!section || !track || !viewport || !line) return;
-
-    const mq = window.matchMedia('(min-width: 1024px) and (min-height: 760px) and (prefers-reduced-motion: no-preference)');
-    let distance = 0;
-    let active = false;
-    let frame = 0;
-
-    const paint = () => {
-      frame = 0;
-      if (!active) return;
-      const p = Math.min(Math.max(-section.getBoundingClientRect().top / distance, 0), 1);
-      track.style.transform = `translate3d(${(-p * distance).toFixed(1)}px, 0, 0)`;
-      line.style.strokeDashoffset = String(1 - p);
-    };
-    const onScroll = () => {
-      if (!frame) frame = requestAnimationFrame(paint);
-    };
-
-    const layout = () => {
-      active = mq.matches;
-      if (!active) {
-        section.style.height = '';
-        track.style.transform = '';
-        return;
-      }
-      track.style.transform = '';
-      distance = Math.max(track.scrollWidth - viewport.clientWidth, 1);
-      section.style.height = `${window.innerHeight + distance}px`;
-      paint();
-    };
-
-    // Fokus keyboard ke kartu di luar layar: scroll halaman ke posisi yang menampilkan kartu itu
-    const onFocus = (event: FocusEvent) => {
-      if (!active) return;
-      const card = (event.target as HTMLElement).closest('li');
-      if (!card) return;
-      const left = card.offsetLeft - parseFloat(getComputedStyle(track).paddingLeft);
-      const p = Math.min(Math.max(left / distance, 0), 1);
-      window.scrollTo({ top: section.getBoundingClientRect().top + window.scrollY + p * distance, behavior: 'instant' });
-    };
-
-    layout();
-    const ro = new ResizeObserver(() => layout());
-    ro.observe(track);
-    mq.addEventListener('change', layout);
-    window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', layout);
-    track.addEventListener('focusin', onFocus);
-    return () => {
-      ro.disconnect();
-      cancelAnimationFrame(frame);
-      mq.removeEventListener('change', layout);
-      window.removeEventListener('scroll', onScroll);
-      window.removeEventListener('resize', layout);
-      track.removeEventListener('focusin', onFocus);
-    };
-  });
-</script>

@@ -3,9 +3,6 @@
 /* Dark mode berbasis class .dark di <html> */
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* Section Projects di-pin dan digeser horizontal hanya di layar lebar yang cukup tinggi, tanpa reduced motion */
-@custom-variant pan (@media (min-width: 1024px) and (min-height: 760px) and (prefers-reduced-motion: no-preference));
-
 @theme {
   --font-sans: 'Bricolage Grotesque Variable', ui-sans-serif, system-ui, sans-serif;
   --font-mono: 'JetBrains Mono Variable', ui-monospace, SFMono-Regular, monospace;
@@ -532,18 +529,10 @@ svg[id^='mermaid'] .edgeLabel rect {
   opacity: 1;
 }
 
-/* Projects: lintasan horizontal; garis progres tergambar sesuai geseran */
-.pan-line {
-  stroke-dasharray: 1 1;
-  stroke-dashoffset: 1;
-}
 
 @media (prefers-reduced-motion: reduce) {
   .js .ink-word {
     opacity: 1;
     transition: none;
-  }
-  .pan-line {
-    stroke-dashoffset: 0;
   }
 }
