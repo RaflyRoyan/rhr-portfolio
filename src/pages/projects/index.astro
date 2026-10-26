@@ -93,7 +93,8 @@ const filters = [
     const valid = new Set(buttons.map((b) => b.dataset.categoryFilter));
 
     const params = new URLSearchParams(window.location.search);
-    let category = valid.has(params.get('kategori') ?? '') ? params.get('kategori')! : '';
+    const requested = params.get('kategori') ?? '';
+    let category = valid.has(requested) ? requested : '';
     input.value = params.get('q') ?? '';
 
     const apply = () => {

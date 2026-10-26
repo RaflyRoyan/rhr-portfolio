@@ -12,13 +12,13 @@ const words = profile.name.split(' ');
 const nameLines = [words.slice(0, 2).join(' '), words.slice(2).join(' ')].filter(Boolean);
 const skills = Object.values(profile.skills).flat();
 const button =
-  'rounded-lg border-2 border-ink px-5 py-3 text-sm font-semibold shadow-[3px_3px_0_var(--ink)] transition-[translate,box-shadow] hover:-translate-y-0.5 hover:shadow-[5px_5px_0_var(--ink)] active:translate-y-0 active:shadow-[1px_1px_0_var(--ink)]';
+  'rounded-full px-6 py-3 text-sm font-semibold transition-[translate,background-color,border-color,color] duration-300 hover:-translate-y-0.5 active:translate-y-0';
 ---
 
 <section id="top" class="relative">
   <div class="relative mx-auto w-full max-w-6xl px-4 pt-12 pb-20 sm:px-6 sm:pt-16 lg:pt-20 lg:pb-28">
     <div class="flex flex-wrap items-center justify-between gap-4">
-      <p class="inline-flex items-center gap-2 rounded-full border-2 border-ink bg-surface px-3.5 py-1.5 text-xs font-semibold sm:text-sm">
+      <p class="inline-flex items-center gap-2 rounded-full border border-line bg-surface px-3.5 py-1.5 text-xs font-semibold shadow-(--shadow-sheet) sm:text-sm">
         <span class="relative flex size-2">
           <span class="absolute inline-flex size-full animate-ping rounded-full bg-accent opacity-60 motion-reduce:hidden"></span>
           <span class="relative inline-flex size-2 rounded-full bg-accent"></span>
@@ -53,8 +53,8 @@ const button =
         <p class="text-xl font-bold sm:text-2xl">{profile.title}, {profile.tagline}</p>
         <p class="mt-4 text-[1.0625rem] leading-7 text-muted">{profile.bio.short}</p>
         <div class="mt-8 flex flex-wrap items-center gap-4">
-          <a href="#projects" class:list={[button, 'bg-accent text-accent-ink']}>Lihat project</a>
-          <a href="#contact" class:list={[button, 'bg-surface']}>Hubungi saya</a>
+          <a href="#projects" class:list={[button, 'bg-ink text-canvas hover:bg-pen']}>Lihat project</a>
+          <a href="#contact" class:list={[button, 'border border-ink/25 hover:border-ink']}>Hubungi saya</a>
         </div>
       </div>
 
@@ -89,7 +89,7 @@ const button =
   </div>
 
   <!-- Pita teknologi berjalan -->
-  <div class="relative -rotate-1 border-y-2 border-ink bg-ink py-4 text-canvas">
+  <div class="relative bg-ink py-4 text-canvas">
     <div class="overflow-hidden" data-marquee-band>
       <div class="marquee">
         {

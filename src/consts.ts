@@ -11,9 +11,9 @@ export const SITE = {
 /** Section di halaman utama; dipakai navbar dan command palette. */
 export const SECTIONS = [
   { id: 'about', label: 'Tentang' },
-  { id: 'services', label: 'Layanan' },
   { id: 'projects', label: 'Project' },
   { id: 'experience', label: 'Pengalaman' },
+  { id: 'services', label: 'Layanan' },
   { id: 'stack', label: 'Teknologi' },
   { id: 'updates', label: 'Update' },
   { id: 'education', label: 'Pendidikan' },

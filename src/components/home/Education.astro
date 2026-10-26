@@ -11,7 +11,7 @@ const stamps = [
 ];
 ---
 
-<section id="education" class="relative border-y-2 border-ink bg-pen-soft py-24 sm:py-32">
+<section id="education" class="relative py-24 sm:py-32">
   <div class="mx-auto w-full max-w-6xl px-4 sm:px-6">
     <SectionHeading title="Pendidikan & sertifikasi" doodle="cap" />
 
@@ -22,8 +22,8 @@ const stamps = [
           profile.education.map((edu) => {
             const [from, to] = edu.period.split(/\s*[—–-]\s*/);
             return (
-              <article class="relative overflow-hidden rounded-2xl border-2 border-ink bg-surface shadow-[6px_6px_0_var(--ink)]" data-reveal>
-                <div class="flex items-center justify-between gap-4 border-b-2 border-ink bg-ink px-6 py-3 text-canvas">
+              <article class="sheet relative overflow-hidden rounded-3xl" data-reveal>
+                <div class="flex items-center justify-between gap-4 bg-ink px-6 py-3 text-canvas">
                   <span class="text-sm font-semibold">Pendidikan formal</span>
                   <Doodle name="cap" class="size-8 text-hl" stroke={4} delay={0.3} />
                 </div>

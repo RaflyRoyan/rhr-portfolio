@@ -1,6 +1,6 @@
 ---
 // Garis tinta di margin kiri halaman yang tergambar mengikuti scroll, dengan mata pena di ujungnya.
-// Membuat ikal kecil di awal tiap section dan ikal ganda di #projects. Path dibangun di client
+// Membuat ikal kecil di judul tiap section dan melompati #projects (di sana garis horizontal). Path dibangun di client
 // karena bergantung pada tinggi section yang sebenarnya.
 ---
 
@@ -42,11 +42,12 @@
       const amp = Math.min(7, x * 0.35);
       // Ikal sejajar judul section (h2), atau sedikit di bawah tepi atas section bila tidak ada judul
       const hostTop = host.getBoundingClientRect().top;
+      // Section [data-pan] (Projects) dilompati: di sana garis tinta horizontal yang mengambil alih
       const marks = [...host.querySelectorAll<HTMLElement>(':scope > section')].map((s) => {
         const heading = s.querySelector('h2')?.getBoundingClientRect();
         return {
           y: heading ? heading.top - hostTop + heading.height / 2 - 18 : s.offsetTop + 104,
-          peak: s.id === 'projects',
+          skip: s.hasAttribute('data-pan') ? { from: s.offsetTop, to: s.offsetTop + s.offsetHeight } : null,
         };
       });
 
@@ -62,14 +63,15 @@
         }
       };
       for (const mark of marks.slice(1)) {
-        wave(mark.y);
-        const r = mark.peak ? 16 : 9;
-        d += loop(x, y, r);
-        y += 2.6 * r;
-        if (mark.peak) {
-          d += loop(x, y, r * 0.7);
-          y += 2.6 * r * 0.7;
+        if (mark.skip) {
+          wave(mark.skip.from);
+          y = mark.skip.to + 40;
+          d += `M ${x} ${y} `;
+          continue;
         }
+        wave(mark.y);
+        d += loop(x, y, 9);
+        y += 2.6 * 9;
       }
       wave(height - 120);
       d += loop(x, y, 12);

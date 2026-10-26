@@ -3,47 +3,32 @@ import SectionHeading from '../SectionHeading.astro';
 import Doodle, { type DoodleName } from '../Doodle.astro';
 import { profile } from '../../data/profile';
 
-// Pola bento: 3 kolom di desktop, 2 di tablet. Ikon, warna, dan lebar urut sesuai profile.services
-const tiles: { icon: DoodleName; tone: string; span: string }[] = [
-  { icon: 'server', tone: 'bg-ink text-canvas', span: 'sm:col-span-2 lg:col-span-2' },
-  { icon: 'db', tone: 'bg-note', span: '' },
-  { icon: 'sync', tone: 'bg-pen-soft', span: '' },
-  { icon: 'chart', tone: 'bg-surface', span: 'lg:col-span-2' },
-  { icon: 'plug', tone: 'bg-accent-soft', span: '' },
-  { icon: 'boxes', tone: 'bg-surface', span: 'sm:col-span-2 lg:col-span-2' },
-];
+// Ikon urut sesuai profile.services
+const icons: DoodleName[] = ['server', 'db', 'sync', 'chart', 'plug', 'boxes'];
 ---
 
-<section id="services" class="relative py-24 sm:py-32">
+<section id="services" class="relative border-y border-line bg-pen-soft py-24 sm:py-32">
   <div class="mx-auto w-full max-w-6xl px-4 sm:px-6">
     <SectionHeading title="Yang saya kerjakan" note="Dari query Oracle sampai dashboard yang dibaca pimpinan." />
-    <ul class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+
+    <!-- Daftar indeks: judul besar di kiri, penjelasan di kanan; baris bergeser halus saat hover -->
+    <ul class="border-t-2 border-ink">
       {
-        profile.services.map(({ title, description }, i) => {
-          const tile = tiles[i % tiles.length];
-          const dark = tile.tone.includes('bg-ink');
-          return (
-            <li
-              class:list={[
-                'group relative flex min-h-56 flex-col justify-between overflow-hidden rounded-2xl border-2 border-ink p-6 transition-[translate,box-shadow] duration-300 hover:-translate-y-1 hover:shadow-[5px_5px_0_var(--ink)] sm:p-7',
-                tile.tone,
-                tile.span,
-              ]}
-              data-reveal
-            >
-              <Doodle
-                name={tile.icon}
-                class:list={['size-14 transition-[rotate] duration-500 group-hover:-rotate-6 sm:size-16', dark ? 'text-hl' : 'text-pen']}
-                stroke={4}
-                delay={0.2}
-              />
-              <div class="mt-10">
-                <h3 class="text-xl font-bold tracking-tight sm:text-2xl">{title}</h3>
-                <p class:list={['mt-2 max-w-md text-sm leading-6', dark ? 'text-canvas/75' : 'text-muted']}>{description}</p>
-              </div>
-            </li>
-          );
-        })
+        profile.services.map(({ title, description }, i) => (
+          <li
+            class="group grid gap-x-8 gap-y-3 border-b border-line py-8 transition-colors duration-300 hover:bg-surface/60 sm:grid-cols-[3.5rem_1fr] lg:grid-cols-[3.5rem_minmax(0,1fr)_minmax(0,1.15fr)] lg:items-baseline"
+            data-reveal
+          >
+            <Doodle
+              name={icons[i % icons.length]}
+              class="size-11 text-pen transition-[rotate,scale] duration-500 group-hover:scale-110 group-hover:-rotate-6 lg:translate-y-2"
+              stroke={4}
+              delay={0.2}
+            />
+            <h3 class="text-2xl font-bold tracking-tight transition-[translate] duration-300 group-hover:translate-x-1.5 sm:text-3xl">{title}</h3>
+            <p class="max-w-xl leading-7 text-muted sm:col-start-2 lg:col-start-3">{description}</p>
+          </li>
+        ))
       }
     </ul>
   </div>

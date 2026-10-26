@@ -3,6 +3,9 @@
 /* Dark mode berbasis class .dark di <html> */
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* Section Projects di-pin dan digeser horizontal hanya di layar lebar yang cukup tinggi, tanpa reduced motion */
+@custom-variant pan (@media (min-width: 1024px) and (min-height: 760px) and (prefers-reduced-motion: no-preference));
+
 @theme {
   --font-sans: 'Bricolage Grotesque Variable', ui-sans-serif, system-ui, sans-serif;
   --font-mono: 'JetBrains Mono Variable', ui-monospace, SFMono-Regular, monospace;
@@ -44,6 +47,10 @@
   --pen-soft: #e2e9fb;
   --accent-soft: #d9f2e8;
 
+  /* Bayangan kartu: offset ke bawah, lembut */
+  --shadow-sheet: 0 1px 2px rgb(16 32 44 / 0.05), 0 18px 36px -26px rgb(16 32 44 / 0.35);
+  --shadow-lift: 0 2px 4px rgb(16 32 44 / 0.06), 0 30px 50px -28px rgb(16 32 44 / 0.45);
+
   /* Syntax highlighting */
   --tok-kw: #0a8f67;
   --tok-type: #2f6690;
@@ -54,7 +61,9 @@
   --tok-punct: #55677a;
 }
 
-.dark {
+/* .inverse = panel malam (section Projects): token gelap juga di mode terang */
+.dark,
+.inverse {
   --canvas: #0d1318;
   --surface: #121a21;
   --surface-2: #17222b;
@@ -71,6 +80,9 @@
   --pen-soft: #18223d;
   --accent-soft: #10302a;
 
+  --shadow-sheet: 0 1px 0 rgb(255 255 255 / 0.03) inset, 0 24px 48px -30px rgb(0 0 0 / 0.85);
+  --shadow-lift: 0 1px 0 rgb(255 255 255 / 0.05) inset, 0 32px 60px -30px rgb(0 0 0 / 0.95);
+
   --tok-kw: #3dd6a3;
   --tok-type: #8fbfe0;
   --tok-str: #dcc9a0;
@@ -78,6 +90,40 @@
   --tok-prop: #e2e8ee;
   --tok-com: #637484;
   --tok-punct: #8696a5;
+}
+
+/* Panel malam di mode gelap dibuat lebih dalam supaya tetap beda dari halaman */
+.dark .inverse {
+  --canvas: #070b0f;
+  --surface: #0f161c;
+  --surface-2: #141e26;
+}
+.inverse {
+  color-scheme: dark;
+  color: var(--ink);
+  background-color: var(--canvas);
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 28px 28px;
+  background-position: -1px -1px;
+}
+
+/* Kartu: garis tipis + bayangan lembut */
+@utility sheet {
+  border: 1px solid var(--line);
+  background-color: var(--surface);
+  box-shadow: var(--shadow-sheet);
+}
+/* Kartu yang terangkat saat hover */
+@utility lift {
+  transition-property: translate, box-shadow, border-color, opacity;
+  transition-duration: 300ms;
+  transition-timing-function: cubic-bezier(0.2, 0.7, 0.2, 1);
+  &:hover {
+    translate: 0 -4px;
+    box-shadow: var(--shadow-lift);
+  }
 }
 
 @layer base {
@@ -475,4 +521,29 @@ svg[id^='mermaid'] :is(.edgeLabel, .labelBkg, .edgeLabel p) {
 }
 svg[id^='mermaid'] .edgeLabel rect {
   fill: var(--surface) !important;
+}
+
+/* Kalimat yang "terisi tinta" kata demi kata saat di-scroll (About.astro) */
+.js .ink-word {
+  opacity: 0.18;
+  transition: opacity 0.35s ease;
+}
+.js .ink-word[data-lit] {
+  opacity: 1;
+}
+
+/* Projects: lintasan horizontal; garis progres tergambar sesuai geseran */
+.pan-line {
+  stroke-dasharray: 1 1;
+  stroke-dashoffset: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .js .ink-word {
+    opacity: 1;
+    transition: none;
+  }
+  .pan-line {
+    stroke-dashoffset: 0;
+  }
 }

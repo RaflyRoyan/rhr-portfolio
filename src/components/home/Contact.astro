@@ -6,7 +6,7 @@ const { email, whatsapp, phone, location, cta } = profile.contact;
 ---
 
 <section id="contact" class="relative px-4 py-24 sm:px-6 sm:py-32">
-  <div class="relative mx-auto w-full max-w-6xl overflow-hidden rounded-[2rem] border-2 border-ink bg-ink px-6 py-14 text-canvas sm:px-12 sm:py-20" data-reveal>
+  <div class="relative mx-auto w-full max-w-6xl overflow-hidden rounded-[2rem] bg-ink shadow-(--shadow-lift) px-6 py-14 text-canvas sm:px-12 sm:py-20" data-reveal>
     <!-- Pesawat kertas + jejak putus-putus yang terbang ke kanan atas -->
     <div class="pointer-events-none absolute inset-0 hidden lg:block" aria-hidden="true">
       <svg class="trail absolute top-16 right-36 h-44 w-[26rem] text-amber-300/70 dark:text-amber-600/70" viewBox="0 0 300 140" fill="none" data-reveal>
@@ -26,15 +26,15 @@ const { email, whatsapp, phone, location, cta } = profile.contact;
       <h2 class="mt-3 text-[clamp(2.75rem,7vw,5.5rem)] leading-[0.95] font-extrabold tracking-[-0.04em]">Mari bekerja sama</h2>
       <p class="mt-6 max-w-xl text-lg leading-8 text-canvas/75">{cta}</p>
 
-      <div class="mt-10 rounded-xl border-2 border-canvas/80 bg-canvas p-2 text-ink">
+      <div class="mt-10 rounded-full bg-canvas p-2 text-ink">
         <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
-          <a href={`mailto:${email}`} class="min-w-0 flex-1 truncate rounded-lg px-4 py-3 font-mono text-base hover:text-accent sm:text-lg">
+          <a href={`mailto:${email}`} class="min-w-0 flex-1 truncate rounded-full px-4 py-3 font-mono text-base hover:text-accent sm:text-lg">
             <span class="text-accent" aria-hidden="true">❯ </span>{email}
           </a>
           <button
             type="button"
             data-copy-email={email}
-            class="rounded-lg bg-accent px-5 py-3 text-sm font-semibold text-accent-ink transition-opacity hover:opacity-90"
+            class="rounded-full bg-accent px-6 py-3 text-sm font-semibold text-accent-ink transition-opacity hover:opacity-90"
           >
             Salin email
           </button>
@@ -46,7 +46,7 @@ const { email, whatsapp, phone, location, cta } = profile.contact;
           href={whatsapp}
           target="_blank"
           rel="noopener noreferrer"
-          class="rounded-lg border-2 border-canvas/80 px-4 py-2 font-semibold transition-colors hover:bg-canvas hover:text-ink"
+          class="rounded-full border border-canvas/40 px-5 py-2.5 font-semibold transition-colors hover:border-canvas hover:bg-canvas hover:text-ink"
         >
           Chat lewat WhatsApp ({phone})
         </a>
