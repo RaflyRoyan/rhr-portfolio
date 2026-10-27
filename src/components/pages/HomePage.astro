@@ -1,0 +1,42 @@
+---
+// Halaman utama, dipakai oleh / (Indonesia) dan /en/ (Inggris). Bahasa dibaca dari URL.
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Hero from '../home/Hero.astro';
+import About from '../home/About.astro';
+import Services from '../home/Services.astro';
+import FeaturedProjects from '../home/FeaturedProjects.astro';
+import Experience from '../home/Experience.astro';
+import TechStack from '../home/TechStack.astro';
+import Updates from '../home/Updates.astro';
+import Education from '../home/Education.astro';
+import Contact from '../home/Contact.astro';
+import InkTrail from '../home/InkTrail.astro';
+import { getProjects, getUpdates } from '../../lib/collections';
+import { getLang, getProfile, t } from '../../i18n';
+
+const lang = getLang(Astro.url);
+const labels = t(lang).hero.stats;
+const projects = await getProjects(lang);
+const updates = await getUpdates(lang);
+
+const stats = [
+  { value: projects.length, label: labels.projects },
+  { value: updates.length, label: labels.updates },
+  { value: getProfile(lang).certifications.length, label: labels.certifications },
+];
+---
+
+<BaseLayout>
+  <div class="relative">
+    <InkTrail />
+    <Hero stats={stats} />
+    <About />
+    <FeaturedProjects projects={projects} />
+    <Experience />
+    <Services />
+    <TechStack projects={projects} />
+    <Updates updates={updates} />
+    <Education />
+    <Contact />
+  </div>
+</BaseLayout>

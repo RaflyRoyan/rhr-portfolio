@@ -2,22 +2,25 @@
 import { getProjects } from '../lib/collections';
 import { SECTIONS } from '../consts';
 import { profile } from '../data/profile';
+import { getLang, localePath, t } from '../i18n';
 
 type Item = { id: string; group: string; label: string; hint?: string; href?: string; action?: string };
 
-const projects = await getProjects();
+const lang = getLang(Astro.url);
+const tr = t(lang).cmdk;
+const projects = await getProjects(lang);
 const items: Item[] = [
-  ...SECTIONS.map((s) => ({ id: `s-${s.id}`, group: 'Section', label: s.label, href: `/#${s.id}` })),
+  ...SECTIONS.map((s) => ({ id: `s-${s.id}`, group: tr.groupSection, label: t(lang).sections[s.id], href: localePath(lang, `/#${s.id}`) })),
   ...projects.map((p) => ({
     id: `p-${p.id}`,
-    group: 'Project',
+    group: tr.groupProject,
     label: p.data.title,
     hint: [p.data.category, ...p.data.tech].join(' '),
-    href: `/projects/${p.id}`,
+    href: localePath(lang, `/projects/${p.id}`),
   })),
-  { id: 'a-projects', group: 'Aksi', label: 'Buka semua project', href: '/projects' },
-  { id: 'a-theme', group: 'Aksi', label: 'Ganti tema terang/gelap', action: 'theme' },
-  { id: 'a-email', group: 'Aksi', label: 'Salin alamat email', action: 'copy-email' },
+  { id: 'a-projects', group: tr.groupAction, label: tr.openProjects, href: localePath(lang, '/projects') },
+  { id: 'a-theme', group: tr.groupAction, label: tr.toggleTheme, action: 'theme' },
+  { id: 'a-email', group: tr.groupAction, label: tr.copyEmail, action: 'copy-email' },
 ];
 const groups = [...new Set(items.map((i) => i.group))];
 ---
@@ -39,12 +42,12 @@ const groups = [...new Set(items.map((i) => i.group))];
       aria-autocomplete="list"
       autocomplete="off"
       spellcheck="false"
-      placeholder="Ketik section, project, atau aksi"
+      placeholder={tr.placeholder}
       class="h-12 w-full bg-transparent font-mono text-sm outline-none placeholder:text-muted"
     />
     <kbd class="hidden rounded border border-line px-1.5 font-mono text-[11px] text-muted sm:inline">Esc</kbd>
   </div>
-  <div id="cmdk-list" role="listbox" aria-label="Hasil" class="max-h-[60vh] overflow-y-auto p-2">
+  <div id="cmdk-list" role="listbox" aria-label={tr.results} class="max-h-[60vh] overflow-y-auto p-2">
     {
       groups.map((group) => (
         <div role="group" aria-label={group} data-cmdk-group class="mb-1">
@@ -63,13 +66,13 @@ const groups = [...new Set(items.map((i) => i.group))];
                 class="flex cursor-pointer items-center justify-between gap-3 rounded-md px-2 py-2 text-sm aria-selected:bg-surface-2 aria-selected:text-accent"
               >
                 <span class="truncate">{item.label}</span>
-                {item.href?.startsWith('/#') && <span class="shrink-0 font-mono text-xs text-muted">#{item.href.slice(2)}</span>}
+                {item.href?.includes('/#') && <span class="shrink-0 font-mono text-xs text-muted">{item.href.slice(item.href.indexOf('#'))}</span>}
               </div>
             ))}
         </div>
       ))
     }
-    <p id="cmdk-empty" hidden class="px-2 py-6 text-center text-sm text-muted">Tidak ada hasil. Coba kata lain, misalnya "oracle".</p>
+    <p id="cmdk-empty" hidden class="px-2 py-6 text-center text-sm text-muted">{tr.empty}</p>
   </div>
 </dialog>
 
@@ -134,8 +137,10 @@ const groups = [...new Set(items.map((i) => i.group))];
     else if (action === 'copy-email') copyEmail(getDialog()?.dataset.email ?? '');
     else if (href) {
       // Section di halaman yang sama: cukup scroll
-      if (href.startsWith('/#') && window.location.pathname === '/') {
-        document.getElementById(href.slice(2))?.scrollIntoView();
+      const [path, hash] = href.split('#');
+      const trim = (p: string) => p.replace(/\/$/, '');
+      if (hash && trim(path) === trim(window.location.pathname)) {
+        document.getElementById(hash)?.scrollIntoView();
         history.replaceState(null, '', href);
       } else {
         navigate(href);

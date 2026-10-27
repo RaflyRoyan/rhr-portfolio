@@ -1,6 +1,7 @@
 ---
 import type { ImageMetadata } from 'astro';
 import { Image, getImage } from 'astro:assets';
+import { getLang, t } from '../../i18n';
 
 interface Props {
   images: ImageMetadata[];
@@ -8,13 +9,14 @@ interface Props {
 }
 
 const { images, title } = Astro.props;
+const tr = t(getLang(Astro.url)).projectPage;
 // Versi besar untuk lightbox, dioptimasi saat build
 const full = await Promise.all(images.map((src) => getImage({ src, width: Math.min(src.width, 1800) })));
-const items = images.map((src, i) => ({ src, full: full[i].src, alt: `${title}, screenshot ${i + 1}` }));
+const items = images.map((src, i) => ({ src, full: full[i].src, alt: `${title}, ${tr.screenshot} ${i + 1}` }));
 ---
 
 <section aria-labelledby="gallery-heading" class="mt-16" data-gallery>
-  <h2 id="gallery-heading" class="text-xl font-semibold tracking-tight">Screenshot</h2>
+  <h2 id="gallery-heading" class="text-xl font-semibold tracking-tight">{tr.gallery}</h2>
   <ul class="mt-6 grid gap-3 sm:grid-cols-2">
     {
       items.map((item, i) => (
@@ -25,7 +27,7 @@ const items = images.map((src, i) => ({ src, full: full[i].src, alt: `${title}, 
             data-full={item.full}
             data-alt={item.alt}
             class="group block w-full overflow-hidden rounded-lg border border-line bg-surface-2"
-            aria-label={`Perbesar ${item.alt}`}
+            aria-label={`${tr.enlarge} ${item.alt}`}
           >
             <Image
               src={item.src}
@@ -41,22 +43,22 @@ const items = images.map((src, i) => ({ src, full: full[i].src, alt: `${title}, 
 
   <dialog
     data-lightbox
-    aria-label="Screenshot"
+    aria-label={tr.gallery}
     class="m-auto max-h-none max-w-none bg-transparent p-0 text-ink backdrop:bg-black/85"
   >
     <figure class="flex h-dvh w-screen flex-col items-center justify-center gap-3 p-4 sm:p-10">
       <img data-lightbox-img alt="" class="max-h-[80vh] max-w-full rounded-lg object-contain" />
       <figcaption class="flex items-center gap-4 font-mono text-xs text-white/80">
-        <button type="button" hidden={items.length < 2} data-lightbox-prev class="rounded-md px-3 py-2 hover:bg-white/10" aria-label="Sebelumnya">‹ prev</button>
+        <button type="button" hidden={items.length < 2} data-lightbox-prev class="rounded-md px-3 py-2 hover:bg-white/10" aria-label={tr.prevImage}>‹ prev</button>
         <span data-lightbox-count></span>
-        <button type="button" hidden={items.length < 2} data-lightbox-next class="rounded-md px-3 py-2 hover:bg-white/10" aria-label="Berikutnya">next ›</button>
+        <button type="button" hidden={items.length < 2} data-lightbox-next class="rounded-md px-3 py-2 hover:bg-white/10" aria-label={tr.nextImage}>next ›</button>
       </figcaption>
     </figure>
     <button
       type="button"
       data-lightbox-close
       class="fixed top-4 right-4 rounded-md px-3 py-2 font-mono text-sm text-white/80 hover:bg-white/10"
-      aria-label="Tutup"
+      aria-label={tr.close}
     >
       Esc
     </button>

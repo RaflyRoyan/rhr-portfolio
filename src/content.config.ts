@@ -27,6 +27,19 @@ const projects = defineCollection({
     }),
 });
 
+// Terjemahan bahasa Inggris: hanya teks; slug harus sama dengan project aslinya
+const projectsEn = defineCollection({
+  loader: glob({ base: './src/content/projects-en', pattern: '**/*.md' }),
+  schema: z.object({
+    title: z.string(),
+    slug: z.string(),
+    summary: z.string(),
+    role: z.string(),
+    period: z.string(),
+    highlights: z.array(z.string()).default([]),
+  }),
+});
+
 const updates = defineCollection({
   loader: glob({ base: './src/content/updates', pattern: '**/*.md' }),
   schema: z.object({
@@ -39,4 +52,4 @@ const updates = defineCollection({
   }),
 });
 
-export const collections = { projects, updates };
+export const collections = { projects, projectsEn, updates };

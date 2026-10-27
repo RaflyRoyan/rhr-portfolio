@@ -1,4 +1,6 @@
 ---
+import { getLang, t } from '../../i18n';
+
 // Kartu IDE "profile.cs": kode di-highlight saat build, efek ketik di client.
 // Tanpa JS (atau dengan reduced motion) kode tampil utuh.
 type Tok = [cls: 'kw' | 'type' | 'str' | 'num' | 'prop' | 'com' | 'punct', text: string];
@@ -16,6 +18,7 @@ const lines: Tok[][] = [
   [['com', '// stability > complexity']],
 ];
 
+const codeLabel = t(getLang(Astro.url)).hero.codeLabel;
 const escape = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 // HTML dibangun sebagai string supaya whitespace template tidak ikut masuk ke blok kode
 const codeHtml = lines
@@ -29,7 +32,7 @@ const codeHtml = lines
 
 <figure
   class="overflow-hidden rounded-xl border border-line bg-surface shadow-[0_24px_60px_-30px_rgb(0_0_0/0.5)]"
-  aria-label="Profil dalam bentuk kode C#"
+  aria-label={codeLabel}
 >
   <div class="flex items-center border-b border-line bg-surface-2 text-xs">
     <span class="border-r border-line border-b-2 border-b-accent bg-surface px-4 py-2.5 font-mono text-ink">profile.cs</span>

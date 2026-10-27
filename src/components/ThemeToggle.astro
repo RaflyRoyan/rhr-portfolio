@@ -1,7 +1,13 @@
+---
+import { getLang, t } from '../i18n';
+
+const tr = t(getLang(Astro.url));
+---
+
 <button
   type="button"
   data-theme-toggle
-  aria-label="Ganti tema"
+  aria-label={tr.nav.theme}
   class="rounded-md p-2 text-muted transition-colors hover:bg-surface-2 hover:text-ink"
 >
   <!-- Ikon matahari tampil di dark mode, bulan di light mode -->

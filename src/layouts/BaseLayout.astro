@@ -9,6 +9,7 @@ import Navbar from '../components/Navbar.astro';
 import Footer from '../components/Footer.astro';
 import CommandPalette from '../components/CommandPalette.astro';
 import { SITE } from '../consts';
+import { LANGS, getLang, getProfile, switchPath, t } from '../i18n';
 
 interface Props {
   title?: string;
@@ -16,14 +17,15 @@ interface Props {
   image?: string;
 }
 
-const { title, description = SITE.description, image = SITE.ogImage } = Astro.props;
+const lang = getLang(Astro.url);
+const { title, description = getProfile(lang).bio.short, image = SITE.ogImage } = Astro.props;
 const pageTitle = title ? `${title} | ${SITE.title}` : `${SITE.title}, Backend Developer`;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const ogImage = new URL(image, Astro.site);
 ---
 
 <!doctype html>
-<html lang={SITE.lang}>
+<html lang={lang}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -31,6 +33,8 @@ const ogImage = new URL(image, Astro.site);
     <title>{pageTitle}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
+    {LANGS.map((l) => <link rel="alternate" hreflang={l} href={new URL(switchPath(Astro.url.pathname, l), Astro.site)} />)}
+    <link rel="alternate" hreflang="x-default" href={new URL(switchPath(Astro.url.pathname, 'id'), Astro.site)} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 
     <meta property="og:type" content="website" />
@@ -38,6 +42,7 @@ const ogImage = new URL(image, Astro.site);
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
     <meta property="og:image" content={ogImage} />
+    <meta property="og:locale" content={lang === 'en' ? 'en_US' : 'id_ID'} />
     <meta name="twitter:card" content="summary_large_image" />
 
     <!-- Terapkan tema + flag .js sebelum paint supaya tidak flash; diterapkan ulang setelah swap ClientRouter.
@@ -73,7 +78,7 @@ const ogImage = new URL(image, Astro.site);
     <a
       href="#main"
       class="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:rounded-md focus:bg-accent focus:px-3 focus:py-2 focus:text-accent-ink"
-      >Lewati ke konten</a
+      >{t(lang).skipToContent}</a
     >
     <Navbar />
     <main id="main" class="flex-1">

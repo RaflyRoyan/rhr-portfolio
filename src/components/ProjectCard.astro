@@ -2,6 +2,7 @@
 import type { CollectionEntry } from 'astro:content';
 import ProjectCover from './ProjectCover.astro';
 import ProjectStatus from './ProjectStatus.astro';
+import { getLang, localePath, t } from '../i18n';
 
 interface Props {
   project: CollectionEntry<'projects'>;
@@ -13,10 +14,11 @@ const { title, summary, category, status, tech, featured, cover } = project.data
 const maxChips = featured ? 6 : 4;
 const shown = tech.slice(0, maxChips);
 const rest = tech.length - shown.length;
+const lang = getLang(Astro.url);
 ---
 
 <a
-  href={`/projects/${project.id}`}
+  href={localePath(lang, `/projects/${project.id}`)}
   data-project={project.id}
   class:list={[
     'sheet lift group flex flex-col gap-4 rounded-3xl p-3 data-[dim]:opacity-35 data-[hl]:border-accent',
@@ -35,7 +37,7 @@ const rest = tech.length - shown.length;
     <p class="mt-2 text-sm leading-6 text-muted">{summary}</p>
     {
       shown.length > 0 && (
-        <ul class="mt-auto flex flex-wrap gap-1.5 pt-4" aria-label="Teknologi" transition:name={`project-tech-${project.id}`}>
+        <ul class="mt-auto flex flex-wrap gap-1.5 pt-4" aria-label={t(lang).projects.tech} transition:name={`project-tech-${project.id}`}>
           {shown.map((item) => (
             <li class="rounded border border-line px-1.5 py-0.5 font-mono text-[11px] text-muted">{item}</li>
           ))}

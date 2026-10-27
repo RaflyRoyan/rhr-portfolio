@@ -1,8 +1,10 @@
 ---
 import Doodle from '../Doodle.astro';
-import { profile } from '../../data/profile';
+import { getLang, getProfile, t } from '../../i18n';
 
-const { email, whatsapp, phone, location, cta } = profile.contact;
+const lang = getLang(Astro.url);
+const tr = t(lang).contact;
+const { email, whatsapp, phone, location, cta } = getProfile(lang).contact;
 ---
 
 <section id="contact" class="relative px-4 py-24 sm:px-6 sm:py-32">
@@ -22,8 +24,8 @@ const { email, whatsapp, phone, location, cta } = profile.contact;
     </div>
 
     <div class="relative max-w-3xl">
-      <p class="hand -rotate-2 text-2xl text-amber-300 dark:text-amber-700">punya ide atau masalah data?</p>
-      <h2 class="mt-3 text-[clamp(2.75rem,7vw,5.5rem)] leading-[0.95] font-extrabold tracking-[-0.04em]">Mari bekerja sama</h2>
+      <p class="hand -rotate-2 text-2xl text-amber-300 dark:text-amber-700">{tr.kicker}</p>
+      <h2 class="mt-3 text-[clamp(2.75rem,7vw,5.5rem)] leading-[0.95] font-extrabold tracking-[-0.04em]">{tr.title}</h2>
       <p class="mt-6 max-w-xl text-lg leading-8 text-canvas/75">{cta}</p>
 
       <div class="mt-10 rounded-full bg-canvas p-2 text-ink">
@@ -36,7 +38,7 @@ const { email, whatsapp, phone, location, cta } = profile.contact;
             data-copy-email={email}
             class="rounded-full bg-accent px-6 py-3 text-sm font-semibold text-accent-ink transition-opacity hover:opacity-90"
           >
-            Salin email
+            {tr.copy}
           </button>
         </div>
       </div>
@@ -48,7 +50,7 @@ const { email, whatsapp, phone, location, cta } = profile.contact;
           rel="noopener noreferrer"
           class="rounded-full border border-canvas/40 px-5 py-2.5 font-semibold transition-colors hover:border-canvas hover:bg-canvas hover:text-ink"
         >
-          Chat lewat WhatsApp ({phone})
+          {tr.whatsapp} ({phone})
         </a>
         <span class="text-canvas/60">{location}</span>
       </div>

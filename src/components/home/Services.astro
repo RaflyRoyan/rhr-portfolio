@@ -1,15 +1,18 @@
 ---
 import SectionHeading from '../SectionHeading.astro';
 import Doodle, { type DoodleName } from '../Doodle.astro';
-import { profile } from '../../data/profile';
+import { getLang, getProfile, t } from '../../i18n';
 
 // Ikon urut sesuai profile.services
 const icons: DoodleName[] = ['server', 'db', 'sync', 'chart', 'plug', 'boxes'];
+const lang = getLang(Astro.url);
+const tr = t(lang).services;
+const profile = getProfile(lang);
 ---
 
 <section id="services" class="relative border-y border-line bg-pen-soft py-24 sm:py-32">
   <div class="mx-auto w-full max-w-6xl px-4 sm:px-6">
-    <SectionHeading title="Yang saya kerjakan" note="Dari query Oracle sampai dashboard yang dibaca pimpinan." />
+    <SectionHeading title={tr.title} note={tr.note} />
 
     <!-- Daftar indeks: judul besar di kiri, penjelasan di kanan; baris bergeser halus saat hover -->
     <ul class="border-t-2 border-ink">

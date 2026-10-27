@@ -1,3 +1,5 @@
+import { ui } from '../i18n/ui';
+
 let hideTimer: number | undefined;
 
 /** Tampilkan toast global (elemen #toast di BaseLayout). */
@@ -33,5 +35,7 @@ export async function copyText(text: string): Promise<boolean> {
 
 export async function copyEmail(email: string) {
   const ok = await copyText(email);
-  showToast(ok ? 'Email disalin ke clipboard' : 'Gagal menyalin. Salin manual: ' + email);
+  // Bahasa toast mengikuti halaman yang sedang dibuka
+  const { toast } = ui[document.documentElement.lang === 'en' ? 'en' : 'id'];
+  showToast(ok ? toast.copied : toast.failed + email);
 }

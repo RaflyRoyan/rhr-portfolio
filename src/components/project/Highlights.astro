@@ -1,16 +1,19 @@
 ---
+import { getLang, t } from '../../i18n';
+
 interface Props {
   items: string[];
   class?: string;
 }
 
 const { items, class: className } = Astro.props;
+const tr = t(getLang(Astro.url)).projectPage;
 ---
 
 {
   items.length > 0 && (
     <div class={className}>
-      <p class="font-mono text-xs text-muted">Sorotan</p>
+      <p class="font-mono text-xs text-muted">{tr.highlights}</p>
       <ul class="mt-3 space-y-2 text-sm leading-6">
         {items.map((item) => (
           <li class="flex gap-2.5">

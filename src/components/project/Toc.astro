@@ -1,5 +1,6 @@
 ---
 import type { MarkdownHeading } from 'astro';
+import { getLang, t } from '../../i18n';
 
 interface Props {
   headings: MarkdownHeading[];
@@ -9,13 +10,14 @@ interface Props {
 
 const { headings, variant } = Astro.props;
 const items = headings.filter((h) => h.depth === 2 || h.depth === 3);
+const tr = t(getLang(Astro.url)).projectPage;
 ---
 
 {
   items.length > 0 &&
     (variant === 'sidebar' ? (
-      <nav aria-label="Daftar isi">
-        <p class="font-mono text-xs text-muted">Di halaman ini</p>
+      <nav aria-label={tr.toc}>
+        <p class="font-mono text-xs text-muted">{tr.onThisPage}</p>
         <ol class="mt-3 space-y-0.5 border-l border-line text-sm">
           {items.map((h) => (
             <li>
@@ -35,7 +37,7 @@ const items = headings.filter((h) => h.depth === 2 || h.depth === 3);
       </nav>
     ) : (
       <details class="rounded-xl border border-line bg-surface">
-        <summary class="cursor-pointer px-4 py-3 text-sm font-medium">Daftar isi</summary>
+        <summary class="cursor-pointer px-4 py-3 text-sm font-medium">{tr.toc}</summary>
         <ol class="space-y-1 border-t border-line px-4 py-3 text-sm">
           {items.map((h) => (
             <li class:list={[h.depth === 3 && 'pl-4']}>

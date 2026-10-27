@@ -1,8 +1,11 @@
 ---
 import SectionHeading from '../SectionHeading.astro';
 import Doodle from '../Doodle.astro';
-import { profile } from '../../data/profile';
+import { getLang, getProfile, t } from '../../i18n';
 
+const lang = getLang(Astro.url);
+const tr = t(lang).education;
+const profile = getProfile(lang);
 // Sertifikasi tampil sebagai stempel; warna dan kemiringan bergantian
 const stamps = [
   'text-accent rotate-[-8deg]',
@@ -13,7 +16,7 @@ const stamps = [
 
 <section id="education" class="relative py-24 sm:py-32">
   <div class="mx-auto w-full max-w-6xl px-4 sm:px-6">
-    <SectionHeading title="Pendidikan & sertifikasi" doodle="cap" />
+    <SectionHeading title={tr.title} doodle="cap" />
 
     <div class="grid items-center gap-16 lg:grid-cols-12 lg:gap-12">
       <!-- Kartu ijazah -->
@@ -24,7 +27,7 @@ const stamps = [
             return (
               <article class="sheet relative overflow-hidden rounded-3xl" data-reveal>
                 <div class="flex items-center justify-between gap-4 bg-ink px-6 py-3 text-canvas">
-                  <span class="text-sm font-semibold">Pendidikan formal</span>
+                  <span class="text-sm font-semibold">{tr.formal}</span>
                   <Doodle name="cap" class="size-8 text-hl" stroke={4} delay={0.3} />
                 </div>
                 <div class="relative p-6 sm:p-8">
@@ -48,7 +51,7 @@ const stamps = [
 
       <!-- Stempel sertifikasi -->
       <div class="lg:col-span-6">
-        <p class="hand mb-6 text-2xl">sertifikasi yang sudah dikantongi</p>
+        <p class="hand mb-6 text-2xl">{tr.certs}</p>
         <ul class="flex flex-wrap justify-center gap-5 sm:justify-start">
           {
             profile.certifications.map((cert, i) => (

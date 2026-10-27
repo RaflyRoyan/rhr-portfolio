@@ -163,6 +163,6 @@ export const profile = {
     location: 'Surabaya, Jawa Timur',
     cta: 'Terbuka untuk diskusi seputar backend .NET, Oracle Database, dan sistem pengolahan data.',
   },
-} as const;
+};
 
 export type Profile = typeof profile;

@@ -1,14 +1,18 @@
 ---
 import SectionHeading from '../SectionHeading.astro';
 import Doodle from '../Doodle.astro';
-import { profile } from '../../data/profile';
+import { getLang, getProfile, t } from '../../i18n';
+
+const lang = getLang(Astro.url);
+const tr = t(lang).experience;
+const profile = getProfile(lang);
 ---
 
 <section id="experience" class="relative py-24 sm:py-32">
   <div class="relative mx-auto grid w-full max-w-6xl gap-12 px-4 sm:px-6 lg:grid-cols-12 lg:gap-10">
     <div class="lg:col-span-4">
       <div class="lg:sticky lg:top-28">
-        <SectionHeading title="Pengalaman" doodle="sync" />
+        <SectionHeading title={tr.title} doodle="sync" />
         <Doodle name="server" class="bob hidden size-36 -rotate-6 text-pen/50 lg:block" stroke={2.5} />
       </div>
     </div>
@@ -37,7 +41,7 @@ import { profile } from '../../data/profile';
                   {job.period}
                   {job.active && (
                     <span class="relative ml-2 px-2 font-hand text-base font-bold text-accent">
-                      aktif
+                      {tr.active}
                       <Doodle name="circle" class="absolute -inset-x-1.5 -inset-y-1.5 h-[calc(100%+0.75rem)] w-[calc(100%+0.75rem)]" stroke={4} delay={0.4} />
                     </span>
                   )}

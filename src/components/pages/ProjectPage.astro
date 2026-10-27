@@ -1,0 +1,142 @@
+---
+// Detail project, dipakai oleh /projects/[slug] dan /en/projects/[slug]. Props dari getProjectPaths().
+import { render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ProjectCover from '../ProjectCover.astro';
+import ProjectStatus from '../ProjectStatus.astro';
+import Toc from '../project/Toc.astro';
+import Highlights from '../project/Highlights.astro';
+import Gallery from '../project/Gallery.astro';
+import { categorySlug, type getProjectPaths } from '../../lib/collections';
+import { formatMonth, getLang, localePath, t } from '../../i18n';
+
+type Props = Awaited<ReturnType<typeof getProjectPaths>>[number]['props'];
+
+const { project, source, prev, next, related } = Astro.props;
+const { title, summary, category, role, period, status, tech, highlights, gallery } = project.data;
+const { Content, headings } = await render(source);
+const lang = getLang(Astro.url);
+const tr = t(lang).projectPage;
+---
+
+<BaseLayout title={title} description={summary}>
+  <div class="mx-auto w-full max-w-6xl px-4 py-10 sm:px-6 sm:py-14">
+    <a href={localePath(lang, '/#projects')} class="font-mono text-sm text-muted hover:text-accent">cd ..</a>
+
+    <div class="mt-6 grid gap-12 lg:grid-cols-[minmax(0,1fr)_17rem] lg:gap-16">
+      <div class="min-w-0 max-w-3xl">
+        <!-- Header: cover, judul, dan tech chips berbagi transition:name dengan kartu -->
+        <header>
+          <ProjectCover project={project} size="page" />
+          <h1 class="mt-8 text-3xl font-semibold tracking-tight text-balance sm:text-4xl" transition:name={`project-title-${project.id}`}>
+            <span>{title}</span>
+          </h1>
+          <p class="mt-4 text-lg leading-8 text-muted">{summary}</p>
+
+          <dl class="mt-8 grid grid-cols-2 gap-x-6 gap-y-4 border-y border-line py-5 sm:grid-cols-4">
+            <div>
+              <dt class="font-mono text-xs text-muted">{tr.category}</dt>
+              <dd class="mt-1 text-sm">
+                <a href={`${localePath(lang, '/projects')}?kategori=${categorySlug(category)}`} class="hover:text-accent">{category}</a>
+              </dd>
+            </div>
+            <div>
+              <dt class="font-mono text-xs text-muted">{tr.status}</dt>
+              <dd class="mt-1"><ProjectStatus status={status} /></dd>
+            </div>
+            <div>
+              <dt class="font-mono text-xs text-muted">{tr.period}</dt>
+              <dd class="mt-1 text-sm">{period}</dd>
+            </div>
+            <div>
+              <dt class="font-mono text-xs text-muted">{tr.role}</dt>
+              <dd class="mt-1 text-sm">{role}</dd>
+            </div>
+          </dl>
+
+          {
+            tech.length > 0 && (
+              <ul class="mt-5 flex flex-wrap gap-1.5" aria-label={tr.tech} transition:name={`project-tech-${project.id}`}>
+                {tech.map((item) => (
+                  <li class="rounded border border-line px-2 py-0.5 font-mono text-xs text-muted">{item}</li>
+                ))}
+              </ul>
+            )
+          }
+        </header>
+
+        <!-- Mobile: daftar isi + sorotan di atas body (sidebar disembunyikan) -->
+        <div class="mt-10 space-y-4 lg:hidden">
+          <Toc headings={headings} variant="inline" />
+          <Highlights items={highlights} class="rounded-xl border border-line bg-surface p-5" />
+        </div>
+
+        <article class="prose-project mt-12">
+          <Content />
+        </article>
+
+        {gallery && gallery.length > 0 && <Gallery images={gallery} title={title} />}
+
+        {
+          related.length > 0 && (
+            <section aria-labelledby="related-heading" class="mt-16">
+              <h2 id="related-heading" class="text-xl font-semibold tracking-tight">
+                {tr.related}
+              </h2>
+              <ol class="mt-6 divide-y divide-line border-y border-line">
+                {related.map((u) => (
+                  <li class="grid gap-x-6 gap-y-1 py-5 sm:grid-cols-[6rem_1fr]">
+                    <time datetime={u.data.date.toISOString()} class="font-mono text-xs leading-6 text-muted">
+                      {formatMonth(lang, u.data.date)}
+                    </time>
+                    <div>
+                      <p class="flex flex-wrap items-baseline gap-x-3">
+                        <span class="font-medium">{u.data.title}</span>
+                        <span class="font-mono text-xs text-accent">{u.data.category.toLowerCase()}</span>
+                      </p>
+                      <p class="mt-1.5 text-sm leading-6 text-muted">{u.data.summary}</p>
+                    </div>
+                  </li>
+                ))}
+              </ol>
+            </section>
+          )
+        }
+      </div>
+
+      <aside class="hidden lg:block">
+        <div class="sticky top-24 space-y-10">
+          <Toc headings={headings} variant="sidebar" />
+          <Highlights items={highlights} />
+        </div>
+      </aside>
+    </div>
+
+    <nav aria-label={tr.otherProjects} class="mt-16 border-t border-line pt-8">
+      <div class="grid gap-3 sm:grid-cols-2">
+        {
+          prev ? (
+            <a href={localePath(lang, `/projects/${prev.id}`)} class="rounded-xl border border-line p-5 transition-colors hover:border-muted">
+              <span class="font-mono text-xs text-muted">{tr.prev}</span>
+              <span class="mt-1 block font-medium">{prev.data.title}</span>
+            </a>
+          ) : (
+            <span class="hidden sm:block" />
+          )
+        }
+        {
+          next && (
+            <a href={localePath(lang, `/projects/${next.id}`)} class="rounded-xl border border-line p-5 text-right transition-colors hover:border-muted">
+              <span class="font-mono text-xs text-muted">{tr.next}</span>
+              <span class="mt-1 block font-medium">{next.data.title}</span>
+            </a>
+          )
+        }
+      </div>
+      <div class="mt-8 flex flex-wrap gap-x-6 gap-y-3 text-sm">
+        <a href={localePath(lang, '/#projects')} class="font-medium text-accent hover:underline">{tr.home}</a>
+        <a href={localePath(lang, '/projects')} class="text-muted hover:text-ink">{tr.allProjects}</a>
+      </div>
+    </nav>
+  </div>
+</BaseLayout>

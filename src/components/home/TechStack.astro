@@ -1,13 +1,16 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 import SectionHeading from '../SectionHeading.astro';
-import { profile } from '../../data/profile';
+import { getLang, getProfile, localePath, t } from '../../i18n';
 
 interface Props {
   projects: CollectionEntry<'projects'>[];
 }
 
 const { projects } = Astro.props;
+const lang = getLang(Astro.url);
+const tr = t(lang).stack;
+const profile = getProfile(lang);
 
 // Nama skill di profil kadang beda dengan nama tech di project; alias menyamakan keduanya.
 const ALIASES: Record<string, string[]> = {
@@ -84,8 +87,8 @@ const groups = Object.entries(profile.skills).map(([group, skills], g) => ({
 ---
 
 <section id="stack" class="relative py-24 sm:py-32">
-  <div class="mx-auto w-full max-w-6xl px-4 sm:px-6" data-stack>
-    <SectionHeading title="Tabel periodik teknologi" doodle="braces" note="Klik satu elemen untuk melihat project yang memakainya." />
+  <div class="mx-auto w-full max-w-6xl px-4 sm:px-6" data-stack data-label-all={tr.allProjects} data-label-pick={tr.pick} data-label-pick-hint={tr.pickHint} data-label-used={tr.statusUsed} data-label-none={tr.statusNone}>
+    <SectionHeading title={tr.title} doodle="braces" note={tr.note} />
 
     <div class="grid gap-6 lg:grid-cols-[1fr_20rem] lg:items-start lg:gap-10">
       <!-- Golongan sebagai baris; elemen mengalir sebagai chip -->
@@ -104,7 +107,7 @@ const groups = Object.entries(profile.skills).map(([group, skills], g) => ({
                       <button
                         type="button"
                         aria-pressed="false"
-                        aria-label={`${name}, dipakai di ${used.length} project`}
+                        aria-label={tr.usedIn(name, used.length)}
                         data-tech={name}
                         data-tech-symbol={symbol}
                         data-tech-group={group}
@@ -145,17 +148,17 @@ const groups = Object.entries(profile.skills).map(([group, skills], g) => ({
             <span class="text-3xl leading-none font-extrabold tracking-tight" data-stack-symbol>?</span>
           </div>
           <div class="min-w-0">
-            <span class="block truncate font-bold" data-stack-name>Pilih elemen</span>
-            <span class="block text-xs text-muted" data-stack-group>klik salah satu chip</span>
+            <span class="block truncate font-bold" data-stack-name>{tr.pick}</span>
+            <span class="block text-xs text-muted" data-stack-group>{tr.pickHint}</span>
           </div>
         </div>
-        <p class="hand mt-5 text-lg" aria-live="polite" data-stack-status>Semua project</p>
+        <p class="hand mt-5 text-lg" aria-live="polite" data-stack-status>{tr.allProjects}</p>
         <ul class="mt-2">
           {
             projects.map((p) => (
               <li>
                 <a
-                  href={`/projects/${p.id}`}
+                  href={localePath(lang, `/projects/${p.id}`)}
                   data-stack-project={p.id}
                   class="flex items-center justify-between gap-3 border-b border-dashed border-line px-1 py-2 text-sm transition-[opacity,color] duration-200 hover:text-accent data-[dim]:opacity-30 data-[hl]:font-semibold data-[hl]:text-accent"
                 >
@@ -183,6 +186,8 @@ const groups = Object.entries(profile.skills).map(([group, skills], g) => ({
     const status = root.querySelector<HTMLElement>('[data-stack-status]')!;
     const field = (name: string) => root.querySelector<HTMLElement>(`[data-stack-${name}]`)!;
     const tile = { number: field('number'), symbol: field('symbol'), name: field('name'), group: field('group') };
+    // Teks status diambil dari atribut data-label-* supaya mengikuti bahasa halaman
+    const label = root.dataset;
     let pinned: HTMLButtonElement | null = null;
 
     const show = (chip: HTMLButtonElement | null) => {
@@ -191,11 +196,11 @@ const groups = Object.entries(profile.skills).map(([group, skills], g) => ({
           r.removeAttribute('data-dim');
           r.removeAttribute('data-hl');
         });
-        status.textContent = 'Semua project';
+        status.textContent = label.labelAll!;
         tile.number.textContent = '—';
         tile.symbol.textContent = '?';
-        tile.name.textContent = 'Pilih elemen';
-        tile.group.textContent = 'klik salah satu chip';
+        tile.name.textContent = label.labelPick!;
+        tile.group.textContent = label.labelPickHint!;
         return;
       }
       const ids = new Set(chip.dataset.techProjects!.split(' ').filter(Boolean));
@@ -204,10 +209,9 @@ const groups = Object.entries(profile.skills).map(([group, skills], g) => ({
         r.toggleAttribute('data-hl', match);
         r.toggleAttribute('data-dim', !match);
       });
-      status.textContent =
-        ids.size > 0
-          ? `${chip.dataset.tech}: dipakai di ${ids.size} project`
-          : `${chip.dataset.tech}: belum tercatat di project mana pun`;
+      status.textContent = (ids.size > 0 ? label.labelUsed! : label.labelNone!)
+        .replace('{tech}', chip.dataset.tech!)
+        .replace('{n}', String(ids.size));
       tile.number.textContent = chip.dataset.techNumber!;
       tile.symbol.textContent = chip.dataset.techSymbol!;
       tile.name.textContent = chip.dataset.tech!;

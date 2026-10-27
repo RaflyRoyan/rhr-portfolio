@@ -42,6 +42,15 @@ Many frontmatter fields carry `# TODO: verifikasi` comments. These mark values t
 - `src/data/profile.ts` is the single source for personal data: bio, experience, certifications, contact. `src/consts.ts` derives `SITE` from it and defines `SECTIONS` (home section anchor ids). The navbar and the command palette both use `SECTIONS`. Adding a home section means updating `SECTIONS` and `NAV_SECTION_IDS`.
 - **Confidentiality rule** (from `profile.ts`): the projects describe internal government systems. Never add DB table or schema names, credentials, or taxpayer data to content or profile data.
 
+## Bilingual (ID / EN)
+
+Indonesian is the default at `/`; English lives under `/en/` with the same routes. `src/pages/**` only holds thin route files; page bodies are in `src/components/pages/*` and components read the language from the URL with `getLang(Astro.url)` (`src/i18n/index.ts`). Internal links must go through `localePath(lang, path)`.
+
+- UI strings: `src/i18n/ui.ts` (`id` is the source, `en: UI` must match its shape). Strings needed by client scripts are passed via `data-*` attributes.
+- Profile: `src/data/profile.en.ts` (typed `Profile`, spreads non-text fields from `profile.ts`). Update both when profile text changes.
+- Projects: `src/content/projects-en/<slug>.md` (collection `projectsEn`) overrides text fields and supplies the body; metadata (cover, tech, status, order) stays in the Indonesian file. `getProjects(lang)` merges them.
+- Updates: titles/summaries in `src/data/updates.en.ts`, keyed by the update file id. Missing entries fall back to Indonesian.
+
 ## Client-side scripts and ClientRouter
 
 `BaseLayout.astro` enables `<ClientRouter />` (view transitions), so module scripts run only once and do not run again on each navigation. Rules:

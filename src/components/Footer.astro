@@ -1,12 +1,14 @@
 ---
 import { SITE } from '../consts';
+import { getLang, t } from '../i18n';
 
 const year = new Date().getFullYear();
+const tr = t(getLang(Astro.url));
 ---
 
 <footer class="border-t border-line">
   <div class="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-2 px-4 py-6 text-sm text-muted sm:px-6">
     <p>© {year} {SITE.author}</p>
-    <p class="font-mono text-xs">Dibangun dengan Astro, di-deploy di Netlify</p>
+    <p class="font-mono text-xs">{tr.footer}</p>
   </div>
 </footer>

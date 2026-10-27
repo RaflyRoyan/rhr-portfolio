@@ -1,14 +1,18 @@
 ---
 import ThemeToggle from './ThemeToggle.astro';
 import { NAV_SECTION_IDS, SECTIONS } from '../consts';
+import { getLang, localePath, switchPath, t } from '../i18n';
 
-const links = SECTIONS.filter((s) => (NAV_SECTION_IDS as readonly string[]).includes(s.id));
-const onProjectsPage = Astro.url.pathname.startsWith('/projects');
+const lang = getLang(Astro.url);
+const tr = t(lang);
+const links = SECTIONS.filter((s) => (NAV_SECTION_IDS as readonly string[]).includes(s.id)).map((s) => ({ ...s, label: tr.sections[s.id] }));
+const onProjectsPage = Astro.url.pathname.startsWith(localePath(lang, '/projects'));
+const other = lang === 'en' ? 'id' : 'en';
 ---
 
 <header class="sticky top-0 z-40 border-b border-line bg-canvas/85 backdrop-blur-md">
-  <nav class="mx-auto flex h-14 w-full max-w-6xl items-center gap-4 px-4 sm:px-6" aria-label="Utama">
-    <a href="/" class="font-mono text-sm font-medium">
+  <nav class="mx-auto flex h-14 w-full max-w-6xl items-center gap-4 px-4 sm:px-6" aria-label={tr.nav.label}>
+    <a href={localePath(lang, '/')} class="font-mono text-sm font-medium">
       <span class="text-accent" aria-hidden="true">❯</span> royan.dev
     </a>
 
@@ -17,7 +21,7 @@ const onProjectsPage = Astro.url.pathname.startsWith('/projects');
         links.map(({ id, label }) => (
           <li>
             <a
-              href={`/#${id}`}
+              href={localePath(lang, `/#${id}`)}
               data-nav-link={id}
               aria-current={id === 'projects' && onProjectsPage ? 'page' : undefined}
               class="rounded-md px-3 py-1.5 text-sm text-muted transition-colors hover:text-ink aria-[current]:text-accent"
@@ -39,10 +43,21 @@ const onProjectsPage = Astro.url.pathname.startsWith('/projects');
           <circle cx="11" cy="11" r="7"></circle>
           <path d="m20 20-3.5-3.5"></path>
         </svg>
-        <span class="lg:hidden">Menu</span>
-        <span class="hidden lg:inline">Cari</span>
+        <span class="lg:hidden">{tr.nav.menu}</span>
+        <span class="hidden lg:inline">{tr.nav.search}</span>
         <kbd class="hidden rounded border border-line px-1.5 font-mono text-[11px] lg:inline">Ctrl K</kbd>
       </button>
+      <a
+        href={switchPath(Astro.url.pathname, other)}
+        hreflang={other}
+        lang={other}
+        data-lang-switch
+        aria-label={tr.nav.switchLang}
+        title={tr.nav.switchLang}
+        class="rounded-md px-2 py-1.5 font-mono text-xs font-semibold text-muted transition-colors hover:bg-surface-2 hover:text-ink"
+      >
+        <span class:list={[lang === 'id' && 'text-ink']}>ID</span><span class="px-0.5 opacity-40" aria-hidden="true">/</span><span class:list={[lang === 'en' && 'text-ink']}>EN</span>
+      </a>
       <ThemeToggle />
     </div>
   </nav>
@@ -81,12 +96,23 @@ const onProjectsPage = Astro.url.pathname.startsWith('/projects');
     };
   });
 
+  // Tombol ID/EN membawa posisi section yang sedang dibuka (#hash) ke halaman bahasa lain.
+  // Fase capture supaya href sudah diperbarui sebelum ClientRouter membaca klik.
+  document.addEventListener(
+    'click',
+    (event) => {
+      const link = (event.target as HTMLElement).closest<HTMLAnchorElement>('[data-lang-switch]');
+      if (link && window.location.hash) link.hash = window.location.hash;
+    },
+    true,
+  );
+
   // Sorot link section yang sedang terlihat (hanya di halaman utama)
   onPageLoad(() => {
     const links = new Map<string, HTMLElement>();
     document.querySelectorAll<HTMLElement>('[data-nav-link]').forEach((a) => links.set(a.dataset.navLink!, a));
     const sections = [...document.querySelectorAll<HTMLElement>('main section[id]')];
-    if (window.location.pathname !== '/' || sections.length === 0) return;
+    if (!['/', '/en', '/en/'].includes(window.location.pathname) || sections.length === 0) return;
 
     const io = new IntersectionObserver(
       (entries) => {

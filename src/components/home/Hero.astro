@@ -1,13 +1,16 @@
 ---
 import CodeCard from './CodeCard.astro';
 import Doodle from '../Doodle.astro';
-import { profile } from '../../data/profile';
+import { getLang, getProfile, t } from '../../i18n';
 
 interface Props {
   stats: { value: number; label: string }[];
 }
 
 const { stats } = Astro.props;
+const lang = getLang(Astro.url);
+const tr = t(lang).hero;
+const profile = getProfile(lang);
 const words = profile.name.split(' ');
 const nameLines = [words.slice(0, 2).join(' '), words.slice(2).join(' ')].filter(Boolean);
 const skills = Object.values(profile.skills).flat();
@@ -30,7 +33,7 @@ const button =
 
     <!-- Nama besar selebar halaman -->
     <div class="relative mt-10 sm:mt-14">
-      <p class="hand absolute -top-8 left-1 -rotate-3 text-xl sm:-top-9 sm:text-2xl" aria-hidden="true" data-depth="0.12">halo, saya</p>
+      <p class="hand absolute -top-8 left-1 -rotate-3 text-xl sm:-top-9 sm:text-2xl" aria-hidden="true" data-depth="0.12">{tr.hello}</p>
       <h1 class="text-[clamp(3.1rem,11.5vw,9.5rem)] leading-[0.88] font-extrabold tracking-[-0.045em]" data-depth="-0.05">
         {
           nameLines.map((line, i) =>
@@ -53,12 +56,12 @@ const button =
         <p class="text-xl font-bold sm:text-2xl">{profile.title}, {profile.tagline}</p>
         <p class="mt-4 text-[1.0625rem] leading-7 text-muted">{profile.bio.short}</p>
         <div class="mt-8 flex flex-wrap items-center gap-4">
-          <a href="#projects" class:list={[button, 'bg-ink text-canvas hover:bg-pen']}>Lihat project</a>
-          <a href="#contact" class:list={[button, 'border border-ink/25 hover:border-ink']}>Hubungi saya</a>
+          <a href="#projects" class:list={[button, 'bg-ink text-canvas hover:bg-pen']}>{tr.viewProjects}</a>
+          <a href="#contact" class:list={[button, 'border border-ink/25 hover:border-ink']}>{tr.contact}</a>
         </div>
       </div>
 
-      <ul class="grid grid-cols-3 gap-4 self-start lg:col-span-2 lg:grid-cols-1 lg:gap-6" aria-label="Ringkasan">
+      <ul class="grid grid-cols-3 gap-4 self-start lg:col-span-2 lg:grid-cols-1 lg:gap-6" aria-label={tr.summary}>
         {
           stats.map(({ value, label }, i) => (
             <li class="relative border-t-2 border-dashed border-line pt-3">
@@ -76,7 +79,7 @@ const button =
 
       <div class="relative lg:col-span-5">
         <div class="pointer-events-none absolute -top-12 right-4 flex items-end gap-1" aria-hidden="true" data-depth="0.18">
-          <span class="hand inline-block -rotate-3 text-lg">profil saya, versi C#</span>
+          <span class="hand inline-block -rotate-3 text-lg">{tr.codeNote}</span>
           <Doodle name="arrow-down" class="h-10 w-7" delay={1.2} />
         </div>
         <Doodle name="db" class="bob absolute -bottom-10 -left-6 z-10 size-16 text-pen" delay={0.9} depth={0.3} />
@@ -94,7 +97,7 @@ const button =
       <div class="marquee">
         {
           [0, 1].map((copy) => (
-            <ul class="flex shrink-0 items-center" aria-hidden={copy === 1 ? 'true' : undefined} aria-label={copy === 0 ? 'Teknologi' : undefined}>
+            <ul class="flex shrink-0 items-center" aria-hidden={copy === 1 ? 'true' : undefined} aria-label={copy === 0 ? tr.tech : undefined}>
               {skills.map((skill) => (
                 <li class="flex items-center gap-6 pr-6 text-lg font-bold whitespace-nowrap sm:text-xl">
                   {skill}
