@@ -2,6 +2,7 @@
 import { existsSync } from 'node:fs';
 import { defineConfig } from 'astro/config';
 import tailwindcss from '@tailwindcss/vite';
+import react from '@astrojs/react';
 import { unified } from '@astrojs/markdown-remark';
 import rehypeMermaid from 'rehype-mermaid';
 import rehypeWrapDiagrams from './src/lib/rehype-wrap-diagrams.mjs';
@@ -20,6 +21,8 @@ export default defineConfig({
   // Ganti dengan domain final (dipakai untuk canonical & og:image absolut)
   site: 'https://rhr-portfolio.netlify.app',
   output: 'static',
+  // Komponen Magic UI (React) dipakai sebagai island
+  integrations: [react()],
   markdown: {
     syntaxHighlight: { type: 'shiki', excludeLangs: ['mermaid', 'math'] },
     shikiConfig: {

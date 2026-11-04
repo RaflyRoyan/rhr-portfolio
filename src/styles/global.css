@@ -536,3 +536,18 @@ svg[id^='mermaid'] .edgeLabel rect {
     transition: none;
   }
 }
+
+/* BlurFade (Magic UI) dirender opacity 0 saat SSR: tampilkan state akhir tanpa JS
+   dan saat pengguna memilih reduced motion */
+html:not(.js) .blur-fade {
+  opacity: 1 !important;
+  filter: none !important;
+  transform: none !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  .blur-fade {
+    opacity: 1 !important;
+    filter: none !important;
+    transform: none !important;
+  }
+}

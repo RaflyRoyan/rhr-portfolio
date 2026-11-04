@@ -1,5 +1,6 @@
 ---
 import Doodle, { type DoodleName } from './Doodle.astro';
+import Reveal from './islands/Reveal';
 
 interface Props {
   title: string;
@@ -13,13 +14,15 @@ const { title, note, doodle } = Astro.props;
 ---
 
 <div class="mb-12 max-w-2xl">
-  <div class="flex items-end gap-3" data-reveal>
+  <Reveal client:visible>
+  <div class="flex items-end gap-3">
     <h2 class="relative text-3xl font-bold tracking-tight sm:text-4xl">
       {title}
       <Doodle name="underline" class="absolute -bottom-3 left-0 h-3 w-[min(100%,14rem)] text-pen" stroke={4} delay={0.25} />
     </h2>
     {doodle && <Doodle name={doodle} class="bob mb-1 size-9 shrink-0 text-pen sm:size-11" delay={0.5} />}
   </div>
+  </Reveal>
   {
     note && (
       <p class="hand mt-6 flex items-start gap-2 text-lg sm:text-xl" data-reveal>
