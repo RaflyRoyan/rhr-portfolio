@@ -88,6 +88,61 @@
   to {
     transform: translateY(calc(-100% - var(--gap)));
     }
+  }
+  --animate-aurora: aurora 8s ease-in-out infinite alternate;
+  --animate-shiny-text: shiny-text 8s infinite;
+  --animate-orbit: orbit calc(var(--duration)*1s) linear infinite;
+  --animate-meteor: meteor 5s linear infinite;
+  @keyframes aurora {
+  0% {
+    background-position: 0% 50%;
+    transform: rotate(-5deg) scale(0.9);
+    }
+  25% {
+    background-position: 50% 100%;
+    transform: rotate(5deg) scale(1.1);
+    }
+  50% {
+    background-position: 100% 50%;
+    transform: rotate(-3deg) scale(0.95);
+    }
+  75% {
+    background-position: 50% 0%;
+    transform: rotate(3deg) scale(1.05);
+    }
+  100% {
+    background-position: 0% 50%;
+    transform: rotate(-5deg) scale(0.9);
+    }
+  }
+  @keyframes shiny-text {
+  0%, 90%, 100% {
+    background-position: calc(-100% - var(--shiny-width)) 0;
+    }
+  30%, 60% {
+    background-position: calc(100% + var(--shiny-width)) 0;
+    }
+  }
+  @keyframes orbit {
+  0% {
+    transform: rotate(calc(var(--angle) * 1deg)) translateY(calc(var(--radius) * 1px)) rotate(calc(var(--angle) * -1deg));
+    }
+  100% {
+    transform: rotate(calc(var(--angle) * 1deg + 360deg)) translateY(calc(var(--radius) * 1px)) rotate(calc((var(--angle) * -1deg) - 360deg));
+    }
+  }
+  @keyframes meteor {
+  0% {
+    transform: rotate(var(--angle)) translateX(0);
+    opacity: 1;
+    }
+  70% {
+    opacity: 1;
+    }
+  100% {
+    transform: rotate(var(--angle)) translateX(-500px);
+    opacity: 0;
+    }
   }}
 
 :root {
@@ -102,7 +157,6 @@
   --accent-from: #6d5efc;
   --accent-to: #22d3ee;
   --accent-soft: #eeecff;
-
 
   /* Nama variabel shadcn untuk komponen registry yang memakai var() langsung */
   --background: var(--canvas);
@@ -140,7 +194,6 @@
   --accent-from: #8b7dff;
   --accent-to: #22d3ee;
   --accent-soft: #1c1838;
-
 
   --shadow-sheet: 0 1px 0 rgb(255 255 255 / 0.03) inset, 0 16px 40px -24px rgb(0 0 0 / 0.9);
   --shadow-lift: 0 1px 0 rgb(255 255 255 / 0.05) inset, 0 28px 56px -28px rgb(0 0 0 / 0.95);
@@ -375,7 +428,6 @@ svg[id^='mermaid'] .edgeLabel rect {
   fill: var(--surface) !important;
 }
 
-
 /* BlurFade (Magic UI) dirender opacity 0 saat SSR: tampilkan state akhir tanpa JS
    dan saat pengguna memilih reduced motion */
 html:not(.js) .blur-fade {
@@ -418,5 +470,16 @@ html[data-magicui-theme-vt='active']::view-transition-new(root) {
   }
   .animate-marquee {
     animation-play-state: paused !important;
+  }
+}
+/* Reduced motion untuk efek tambahan (aurora, shiny text, orbit, meteor) */
+@media (prefers-reduced-motion: reduce) {
+  .animate-aurora,
+  .animate-shiny-text,
+  .animate-orbit {
+    animation-play-state: paused !important;
+  }
+  .animate-meteor {
+    display: none !important;
   }
 }

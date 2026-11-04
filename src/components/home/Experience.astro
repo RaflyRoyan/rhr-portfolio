@@ -1,5 +1,6 @@
 ---
 import SectionHeading from '../SectionHeading.astro';
+import SectionGlow from '../SectionGlow.astro';
 import Reveal from '../islands/Reveal';
 import GlowCard from '../islands/GlowCard';
 import { getLang, getProfile, t } from '../../i18n';
@@ -9,11 +10,12 @@ const tr = t(lang).experience;
 const profile = getProfile(lang);
 ---
 
-<section id="experience" class="relative py-24 sm:py-32">
+<section id="experience" class="relative isolate overflow-x-clip py-24 sm:py-32">
+  <SectionGlow side="left" />
   <div class="relative mx-auto grid w-full max-w-6xl gap-12 px-4 sm:px-6 lg:grid-cols-12 lg:gap-10">
     <div class="lg:col-span-4">
       <div class="lg:sticky lg:top-28">
-        <SectionHeading title={tr.title} />
+        <SectionHeading eyebrow={`03 · ${t(lang).sections.experience}`} title={tr.title} />
       </div>
     </div>
 

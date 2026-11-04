@@ -1,26 +1,34 @@
 ---
+import { AuroraText } from '@/components/ui/aurora-text';
 import Reveal from './islands/Reveal';
 
 interface Props {
   title: string;
   /** Satu kalimat penjelas di bawah judul. */
   note?: string;
-  /** Label kecil di atas judul (mis. nomor atau kategori section). */
+  /** Label kecil di atas judul, mis. "01 · Tentang". */
   eyebrow?: string;
 }
 
 const { title, note, eyebrow } = Astro.props;
+// Kata terakhir judul diberi efek aurora (teks gradien bergerak)
+const words = title.split(' ');
+const last = words.pop() ?? '';
+const head = words.join(' ');
+const aurora = ['var(--accent-from)', '#a78bfa', 'var(--accent-to)', 'var(--accent-from)'];
 ---
 
 <Reveal client:visible className="mb-12 max-w-2xl">
   {
     eyebrow && (
-      <p class="mb-3 inline-flex items-center gap-2 rounded-full border border-line bg-surface/70 px-3 py-1 font-mono text-xs text-muted">
+      <p class="mb-4 inline-flex items-center gap-2 rounded-full border border-line bg-surface/70 px-3 py-1 font-mono text-xs text-muted backdrop-blur">
         <span class="size-1.5 rounded-full bg-linear-to-r from-accent-from to-accent-to" aria-hidden="true" />
         {eyebrow}
       </p>
     )
   }
-  <h2 class="text-3xl font-bold tracking-tight text-balance sm:text-5xl">{title}</h2>
+  <h2 class="text-3xl font-bold tracking-tight text-balance sm:text-5xl">
+    {head && <>{head} </>}<AuroraText colors={aurora} speed={0.6}>{last}</AuroraText>
+  </h2>
   {note && <p class="mt-4 text-lg leading-7 text-muted">{note}</p>}
 </Reveal>

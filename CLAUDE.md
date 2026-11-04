@@ -58,14 +58,26 @@ Indonesian is the default at `/`; English lives under `/en/` with the same route
 - Wrap per-page DOM setup in `onPageLoad(setup)` from `src/scripts/lifecycle.ts`. It runs on `astro:page-load` and calls the returned cleanup function on `astro:before-swap`. Respect `prefersReducedMotion()` for animations.
 - Alternatively, delegate listeners to `document`, as `CommandPalette.astro` does.
 - Dark mode uses the `.dark` class on `<html>`. An inline script in `BaseLayout` applies it before paint and again after `astro:after-swap`. Every new visit starts light regardless of the system preference; the toggle stores `rhr-theme` in sessionStorage, so dark only lasts for that tab session. The `js` class on `<html>` marks that JS is enabled.
-- Elements with `[data-reveal]` or `[data-draw]` get `.is-visible` from a shared IntersectionObserver in `BaseLayout`.
+- The theme toggle is the `ThemeToggler` island (Magic UI `animated-theme-toggler` in controlled mode); it writes `rhr-theme`. `toggleTheme()` in `src/scripts/theme.ts` is still used by the command palette.
 - Toasts and clipboard helpers live in `src/scripts/feedback.ts` (`showToast`, `copyText`).
+
+## React islands and Magic UI
+
+`@astrojs/react` (pinned `7.0.1` for Astro 7.3.8 / Node 22.21) renders Magic UI components as islands. shadcn is configured by a hand-written `components.json` (no `shadcn init`, so it does not rewrite `global.css`); add components with `npx shadcn@latest add @magicui/<slug>`. Alias `@/*` maps to `src/*`.
+
+- `src/components/ui/*.tsx` is registry output. Do not edit it; customize through props/`className` or a wrapper in `src/components/islands/`.
+- Wrappers worth knowing: `Reveal` (BlurFade + `.blur-fade` CSS override so content shows without JS and with reduced motion), `GlowCard` (MagicCard in theme colors), `Ticker`, `RoleRotate` (span version of word-rotate, the registry one renders an `<h1>`), `ThemeToggler`, `HeroTerminal`, `AboutOrbit`, `ContactGlobe`, `ContactDock`. `ShimmerLink.astro` is an `<a>` version of ShimmerButton.
+- Hydration: `client:load` only for hero/navbar; `client:visible` below the fold; pure-CSS components (marquee, shine-border, aurora-text, animated-shiny-text, orbiting-circles) get no directive. A component whose SSR output is an empty fragment (e.g. meteors) cannot use `client:visible`; use `client:idle`.
+- Never read `matchMedia` during render (hydration mismatch); use `useReducedMotionSafe()` from `src/lib/use-reduced-motion-safe.ts`.
+- Never put `transition:name` targets or above-the-fold hero text inside `Reveal` (it SSRs `opacity:0`); the hero uses the CSS `.hero-in` entrance.
+- `vite.optimizeDeps.include` in `astro.config.mjs` pre-bundles React, motion, lucide, next-themes, cobe and Astro's transition modules. Without it the dev server re-optimizes mid-session and React gets duplicated ("Invalid hook call"). If that error shows up in dev, stop the server, delete `node_modules/.vite` and restart.
+- Skill icons for the icon cloud and About orbit come from `simple-icons` at build time (`src/lib/skill-icons.ts`), with no CDN requests.
 
 ## Styling
 
-Tailwind v4 is configured entirely in `src/styles/global.css`. Color tokens (`canvas`, `surface`, `surface-2`, `line`, `ink`, `muted`, `accent`, `accent-ink`) are exposed via `@theme inline` over CSS variables that switch between `:root` and `.dark`. Use these semantic utilities (`bg-surface`, `text-muted`, `border-line`), not raw Tailwind palette colors. Fonts come from Fontsource: Bricolage Grotesque Variable (sans), JetBrains Mono Variable (mono) and Kalam (`.hand` handwriting notes).
+Tailwind v4 is configured entirely in `src/styles/global.css`. Color tokens (`canvas`, `surface`, `surface-2`, `line`, `ink`, `muted`, `accent`, `accent-ink`, plus `accent-from`/`accent-to` for gradients and `accent-soft`) are exposed via `@theme inline` over CSS variables that switch between `:root` and `.dark`. shadcn variable names (`--background`, `--border`, …) are mapped onto the same tokens. Use these semantic utilities (`bg-surface`, `text-muted`, `border-line`), not raw Tailwind palette colors. Fonts come from Fontsource: Bricolage Grotesque Variable (sans) and JetBrains Mono Variable (mono).
 
-The visual theme is an engineer's notebook. The body has a graph-paper background. On top of that are `pen` (blue ink), `hl` (highlighter) and `note` (sticky note) tokens. `src/components/Doodle.astro` holds the hand-drawn SVG doodles. Each path uses `pathLength="1"` and draws itself through `stroke-dashoffset` once its `[data-draw]` element becomes visible. The `#sketchy` SVG filter in `BaseLayout` adds the wobble. To add a doodle, add an entry to `DOODLES`. Other helpers in `global.css`: `.highlight` (marker swipe), `.sticky-note`, `.bob` (floating), `.marquee` (scrolling tech strip in the hero) and `.trail` (dashed path revealed with clip-path). All of them respect `prefers-reduced-motion`.
+The visual theme is modern Magic UI style: neutral zinc palette with a violet→cyan accent gradient, a global `DotPattern` background, and per-section `SectionGlow.astro` (gradient divider + accent glows). `SectionHeading.astro` takes an `eyebrow` (e.g. `01 · Tentang`) and renders the title's last word with `AuroraText`. Every animation must respect `prefers-reduced-motion` (see the reduced-motion blocks at the end of `global.css`).
 
 ## Deployment
 

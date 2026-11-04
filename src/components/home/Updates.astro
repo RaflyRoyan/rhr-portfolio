@@ -1,6 +1,7 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 import SectionHeading from '../SectionHeading.astro';
+import SectionGlow from '../SectionGlow.astro';
 import GlowCard from '../islands/GlowCard';
 import { UPDATE_CATEGORIES } from '../../content.config';
 import { formatMonth, getLang, localePath, t } from '../../i18n';
@@ -17,9 +18,10 @@ const tabs = [{ value: 'all', label: tr.all }, ...UPDATE_CATEGORIES.map((c) => (
 const counts = Object.fromEntries(tabs.map((t) => [t.value, t.value === 'all' ? updates.length : updates.filter((u) => u.data.category === t.value).length]));
 ---
 
-<section id="updates" class="relative py-24 sm:py-32">
+<section id="updates" class="relative isolate overflow-x-clip py-24 sm:py-32">
+  <SectionGlow side="right" />
   <div class="mx-auto w-full max-w-6xl px-4 sm:px-6" data-updates data-limit={LIMIT}>
-    <SectionHeading title={tr.title} note={tr.note} />
+    <SectionHeading eyebrow={`06 · ${t(lang).sections.updates}`} title={tr.title} note={tr.note} />
 
     <div class="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
       <div class="inline-flex gap-1 rounded-full border border-line bg-surface/70 p-1 backdrop-blur" role="group" aria-label={tr.filter}>

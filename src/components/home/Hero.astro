@@ -1,5 +1,7 @@
 ---
 import { AnimatedGridPattern } from '@/components/ui/animated-grid-pattern';
+import { AnimatedShinyText } from '@/components/ui/animated-shiny-text';
+import { Particles } from '@/components/ui/particles';
 import RoleRotate from '../islands/RoleRotate';
 import Ticker from '../islands/Ticker';
 import HeroTerminal from '../islands/HeroTerminal';
@@ -36,6 +38,10 @@ const terminalLines = [
     className="-z-10 fill-accent/30 stroke-line/70 motion-reduce:hidden [mask-image:radial-gradient(640px_circle_at_70%_30%,white,transparent)] inset-x-0 inset-y-[-20%] h-[140%]"
   />
 
+  <div class="pointer-events-none absolute inset-0 -z-10 motion-reduce:hidden" aria-hidden="true">
+    <Particles client:idle className="absolute inset-0" quantity={70} ease={70} size={0.5} color="#8b7dff" refresh={false} />
+  </div>
+  <span class="pointer-events-none absolute -top-40 left-1/2 -z-10 size-[44rem] -translate-x-1/2 rounded-full bg-[radial-gradient(circle,color-mix(in_oklab,var(--accent-from)_20%,transparent),transparent_65%)] blur-3xl" aria-hidden="true"></span>
   <div class="mx-auto w-full max-w-6xl px-4 pt-16 pb-24 sm:px-6 sm:pt-20 lg:pt-24 lg:pb-32">
     <div class="hero-in" style="--hero-delay: 0.05s">
       <div class="flex flex-wrap items-center justify-between gap-4">
@@ -44,7 +50,7 @@ const terminalLines = [
             <span class="absolute inline-flex size-full animate-ping rounded-full bg-accent opacity-60 motion-reduce:hidden"></span>
             <span class="relative inline-flex size-2 rounded-full bg-accent"></span>
           </span>
-          {profile.currentPosition}
+          <AnimatedShinyText className="mx-0 max-w-none text-ink/80 dark:text-ink/80">{profile.currentPosition}</AnimatedShinyText>
         </p>
         <p class="font-mono text-xs text-muted sm:text-sm">{profile.location}</p>
       </div>
@@ -98,7 +104,7 @@ const terminalLines = [
         </ul>
       </div>
 
-      <div class="lg:col-span-5 lg:pt-6">
+      <div class="lg:col-span-5 lg:pt-2">
         <HeroTerminal client:visible title={tr.terminalTitle} lines={terminalLines} />
       </div>
     </div>

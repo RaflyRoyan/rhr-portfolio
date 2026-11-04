@@ -3,7 +3,9 @@ import type { CollectionEntry } from 'astro:content';
 import { ArrowRight, CircleCheck } from 'lucide-react';
 import { BentoGrid } from '@/components/ui/bento-grid';
 import { BorderBeam } from '@/components/ui/border-beam';
+import { RetroGrid } from '@/components/ui/retro-grid';
 import SectionHeading from '../SectionHeading.astro';
+import SectionGlow from '../SectionGlow.astro';
 import ProjectCard from '../ProjectCard.astro';
 import ProjectCover from '../ProjectCover.astro';
 import Reveal from '../islands/Reveal';
@@ -24,10 +26,14 @@ const tiles = projects.map((project) => ({ project, big: project.data.featured }
 const firstBig = tiles.find((tile) => tile.big)?.project.id;
 ---
 
-<section id="projects" class="relative py-24 sm:py-32">
+<section id="projects" class="relative isolate overflow-x-clip py-24 sm:py-32">
+  <SectionGlow side="right" />
+  <div class="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[28rem] overflow-hidden [mask-image:linear-gradient(to_bottom,white,transparent)]" aria-hidden="true">
+    <RetroGrid client:visible angle={65} cellSize={56} opacity={0.7} lightLineColor="#8b84f0" darkLineColor="#6d63d9" />
+  </div>
   <div class="mx-auto w-full max-w-6xl px-4 sm:px-6">
     <div class="flex flex-wrap items-end justify-between gap-x-8">
-      <SectionHeading title={tr.title} note={tr.note} />
+      <SectionHeading eyebrow={`02 · ${t(lang).sections.projects}`} title={tr.title} note={tr.note} />
       <a
         href={localePath(lang, '/projects')}
         class="mb-12 inline-flex items-center gap-2 rounded-full border border-line bg-surface/70 px-5 py-2.5 text-sm font-semibold backdrop-blur transition-colors hover:border-muted"

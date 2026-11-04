@@ -1,0 +1,27 @@
+---
+// Lapisan latar section: garis pemisah gradien di atas + cahaya aksen di satu sisi.
+// Dipakai di dalam <section class="relative isolate overflow-x-clip">.
+interface Props {
+  side?: 'left' | 'right';
+}
+
+const { side = 'left' } = Astro.props;
+---
+
+<div class="pointer-events-none absolute inset-0 -z-10" aria-hidden="true">
+  <span class="absolute inset-x-0 top-0 mx-auto h-px max-w-5xl bg-linear-to-r from-transparent via-line to-transparent"></span>
+  <span
+    class:list={[
+      'absolute top-10 size-[34rem] rounded-full opacity-70 blur-3xl',
+      'bg-[radial-gradient(circle,color-mix(in_oklab,var(--accent-from)_22%,transparent),transparent_65%)]',
+      side === 'left' ? '-left-48' : '-right-48',
+    ]}
+  ></span>
+  <span
+    class:list={[
+      'absolute bottom-0 size-[26rem] rounded-full opacity-60 blur-3xl',
+      'bg-[radial-gradient(circle,color-mix(in_oklab,var(--accent-to)_16%,transparent),transparent_65%)]',
+      side === 'left' ? 'right-0' : 'left-0',
+    ]}
+  ></span>
+</div>

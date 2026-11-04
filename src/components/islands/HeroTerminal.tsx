@@ -16,7 +16,7 @@ export default function HeroTerminal({ title, lines }: { title: string; lines: T
   return (
     <div aria-hidden="true" className="relative">
       <span className="absolute top-3 left-1/2 z-10 -translate-x-1/2 font-mono text-xs text-muted">{title}</span>
-      <Terminal sequence={!reduced} className="max-w-none border-line bg-surface/80 shadow-(--shadow-lift) backdrop-blur [&_code]:overflow-hidden [&_pre]:whitespace-pre-wrap [&_pre]:break-words">
+      <Terminal sequence={!reduced} className="max-h-none max-w-none border-line bg-surface/80 shadow-(--shadow-lift) backdrop-blur [&_code]:gap-y-1.5 [&_code]:overflow-hidden [&_code_*]:text-[15px] [&_pre]:p-6 [&_pre]:whitespace-pre-wrap [&_pre]:break-words">
         {lines.flatMap(({ command, output }, i) =>
           reduced
             ? [

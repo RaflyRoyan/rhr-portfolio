@@ -2,6 +2,7 @@
 import { Award, GraduationCap } from 'lucide-react';
 import { ShineBorder } from '@/components/ui/shine-border';
 import SectionHeading from '../SectionHeading.astro';
+import SectionGlow from '../SectionGlow.astro';
 import Reveal from '../islands/Reveal';
 import GlowCard from '../islands/GlowCard';
 import { getLang, getProfile, t } from '../../i18n';
@@ -12,9 +13,10 @@ const profile = getProfile(lang);
 const shine = ['var(--accent-from)', 'var(--accent-to)'];
 ---
 
-<section id="education" class="relative py-24 sm:py-32">
+<section id="education" class="relative isolate overflow-x-clip py-24 sm:py-32">
+  <SectionGlow side="left" />
   <div class="mx-auto w-full max-w-6xl px-4 sm:px-6">
-    <SectionHeading title={tr.title} />
+    <SectionHeading eyebrow={`07 · ${t(lang).sections.education}`} title={tr.title} />
 
     <div class="grid gap-10 lg:grid-cols-12 lg:gap-12">
       <div class="lg:col-span-6">

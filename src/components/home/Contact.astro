@@ -1,5 +1,7 @@
 ---
+import { Meteors } from '@/components/ui/meteors';
 import ShimmerLink from '../ShimmerLink.astro';
+import SectionGlow from '../SectionGlow.astro';
 import Reveal from '../islands/Reveal';
 import ContactDock from '../islands/ContactDock';
 import ContactGlobe from '../islands/ContactGlobe';
@@ -16,12 +18,16 @@ const dockItems = [
 ];
 ---
 
-<section id="contact" class="relative px-4 py-24 sm:px-6 sm:py-32">
+<section id="contact" class="relative isolate overflow-x-clip px-4 py-24 sm:px-6 sm:py-32">
+  <SectionGlow side="right" />
   <Reveal client:visible className="relative mx-auto w-full max-w-6xl">
     <div class="relative overflow-hidden rounded-[2rem] border border-line bg-surface/80 px-6 py-14 shadow-(--shadow-lift) backdrop-blur sm:px-12 sm:py-16">
       <span
         class="pointer-events-none absolute -top-40 -left-40 size-96 rounded-full bg-[radial-gradient(circle,color-mix(in_oklab,var(--accent-from)_22%,transparent),transparent_70%)]"
         aria-hidden="true"></span>
+      <div class="pointer-events-none absolute inset-0 overflow-hidden motion-reduce:hidden" aria-hidden="true">
+        <Meteors client:idle number={18} className="bg-accent [&>div]:from-accent" />
+      </div>
 
       <div class="relative grid items-center gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,24rem)]">
         <div class="max-w-2xl">

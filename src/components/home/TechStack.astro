@@ -3,6 +3,7 @@ import type { CollectionEntry } from 'astro:content';
 import { Marquee } from '@/components/ui/marquee';
 import { IconCloud } from '@/components/ui/icon-cloud';
 import SectionHeading from '../SectionHeading.astro';
+import SectionGlow from '../SectionGlow.astro';
 import Reveal from '../islands/Reveal';
 import { skillIconImages } from '../../lib/skill-icons';
 import { getLang, getProfile, localePath, t } from '../../i18n';
@@ -87,9 +88,10 @@ const rails = [allSkills.slice(0, half), allSkills.slice(half)];
 const iconImages = skillIconImages(allSkills);
 ---
 
-<section id="stack" class="relative py-24 sm:py-32">
+<section id="stack" class="relative isolate overflow-x-clip py-24 sm:py-32">
+  <SectionGlow side="left" />
   <div class="mx-auto w-full max-w-6xl px-4 sm:px-6" data-stack data-label-all={tr.allProjects} data-label-pick={tr.pick} data-label-pick-hint={tr.pickHint} data-label-used={tr.statusUsed} data-label-none={tr.statusNone}>
-    <SectionHeading title={tr.title} note={tr.note} />
+    <SectionHeading eyebrow={`05 · ${t(lang).sections.stack}`} title={tr.title} note={tr.note} />
 
     <!-- Pita skill berjalan (Marquee) + awan ikon (IconCloud) -->
     <div class="mb-10 grid items-center gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
