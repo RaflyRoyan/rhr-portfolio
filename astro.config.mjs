@@ -49,7 +49,14 @@ export default defineConfig({
     // Pre-bundle dependensi island sejak awal; kalau ditemukan belakangan, Vite dev
     // mengoptimasi ulang dan React terduplikasi ("Invalid hook call")
     optimizeDeps: {
-      include: ['react', 'react-dom', 'react-dom/client', 'react/jsx-runtime', 'react/jsx-dev-runtime', 'motion/react', 'lucide-react', 'next-themes', 'cobe'],
+      include: [
+        'react', 'react-dom', 'react-dom/client', 'react/jsx-runtime', 'react/jsx-dev-runtime',
+        'motion/react', 'lucide-react', 'next-themes', 'cobe',
+        'astro/virtual-modules/transitions-events.js',
+        'astro/virtual-modules/transitions-router.js',
+        'astro/virtual-modules/transitions-swap-functions.js',
+        'astro/virtual-modules/transitions-types.js',
+      ],
     },
   },
 });
