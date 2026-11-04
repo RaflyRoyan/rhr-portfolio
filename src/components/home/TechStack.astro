@@ -1,6 +1,10 @@
 ---
 import type { CollectionEntry } from 'astro:content';
+import { Marquee } from '@/components/ui/marquee';
+import { IconCloud } from '@/components/ui/icon-cloud';
 import SectionHeading from '../SectionHeading.astro';
+import Reveal from '../islands/Reveal';
+import { skillIconImages } from '../../lib/skill-icons';
 import { getLang, getProfile, localePath, t } from '../../i18n';
 
 interface Props {
@@ -68,15 +72,8 @@ const symbolOf = (name: string) => {
 };
 
 // Warna golongan; urutan mengikuti profile.skills
-const TONES = [
-  'bg-accent-soft',
-  'bg-note',
-  'bg-surface',
-  'bg-rose-100 dark:bg-rose-950/60',
-  'bg-violet-100 dark:bg-violet-950/60',
-  'bg-orange-100 dark:bg-orange-950/60',
-  'bg-slate-200 dark:bg-slate-800',
-];
+// Warna titik golongan; urutan mengikuti profile.skills
+const TONES = ['bg-accent', 'bg-cyan-500', 'bg-violet-400', 'bg-sky-500', 'bg-indigo-400', 'bg-teal-500', 'bg-zinc-400'];
 
 let atomic = 0;
 const groups = Object.entries(profile.skills).map(([group, skills], g) => ({
@@ -84,21 +81,44 @@ const groups = Object.entries(profile.skills).map(([group, skills], g) => ({
   tone: TONES[g % TONES.length],
   skills: skills.map((name) => ({ name, symbol: symbolOf(name), number: ++atomic, projects: projectsUsing(name) })),
 }));
+const allSkills = Object.values(profile.skills).flat();
+const half = Math.ceil(allSkills.length / 2);
+const rails = [allSkills.slice(0, half), allSkills.slice(half)];
+const iconImages = skillIconImages(allSkills);
 ---
 
 <section id="stack" class="relative py-24 sm:py-32">
   <div class="mx-auto w-full max-w-6xl px-4 sm:px-6" data-stack data-label-all={tr.allProjects} data-label-pick={tr.pick} data-label-pick-hint={tr.pickHint} data-label-used={tr.statusUsed} data-label-none={tr.statusNone}>
     <SectionHeading title={tr.title} note={tr.note} />
 
+    <!-- Pita skill berjalan (Marquee) + awan ikon (IconCloud) -->
+    <div class="mb-10 grid items-center gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
+      <div class="relative flex flex-col gap-3 overflow-hidden [mask-image:linear-gradient(to_right,transparent,white_12%,white_88%,transparent)]" aria-hidden="true">
+        {
+          rails.map((rail, r) => (
+            <Marquee pauseOnHover reverse={r === 1} className="[--duration:38s] [--gap:0.75rem] p-1">
+              {rail.map((skill) => (
+                <span class="rounded-full border border-line bg-surface px-4 py-2 text-sm font-medium whitespace-nowrap shadow-(--shadow-sheet)">{skill}</span>
+              ))}
+            </Marquee>
+          ))
+        }
+      </div>
+      <div class="relative mx-auto hidden size-[22rem] lg:block" aria-hidden="true">
+        <span class="absolute inset-10 rounded-full bg-[radial-gradient(circle,color-mix(in_oklab,var(--accent)_16%,transparent),transparent_70%)]" />
+        <IconCloud client:visible images={iconImages} />
+      </div>
+    </div>
+
     <div class="grid gap-6 lg:grid-cols-[1fr_20rem] lg:items-start lg:gap-10">
       <!-- Golongan sebagai baris; elemen mengalir sebagai chip -->
-      <dl class="sheet divide-y divide-dashed divide-line rounded-3xl px-5 sm:px-6" data-reveal>
+      <dl class="divide-y divide-line rounded-2xl border border-line bg-surface/80 px-5 backdrop-blur sm:px-6">
         {
           groups.map(({ group, tone, skills }) => (
             <div class="grid gap-3 py-5 sm:grid-cols-[9rem_1fr] sm:gap-6">
               <dt class="flex items-center gap-2 sm:pt-1.5">
-                <span class:list={['size-3 shrink-0 rounded-sm border border-ink', tone]} aria-hidden="true" />
-                <span class="hand text-lg leading-tight font-bold">{group}</span>
+                <span class:list={['size-2.5 shrink-0 rounded-full', tone]} aria-hidden="true" />
+                <span class="text-sm font-semibold">{group}</span>
               </dt>
               <dd>
                 <ul class="flex flex-wrap gap-2">
@@ -113,12 +133,11 @@ const groups = Object.entries(profile.skills).map(([group, skills], g) => ({
                         data-tech-group={group}
                         data-tech-number={number}
                         data-tech-projects={used.join(' ')}
-                        class="group inline-flex items-center gap-2 rounded-lg border border-line bg-canvas py-1 pr-3 pl-1 text-sm transition-[translate,border-color,background-color,color] duration-200 hover:-translate-y-0.5 hover:border-ink aria-pressed:border-ink aria-pressed:bg-ink aria-pressed:text-canvas"
+                        class="group inline-flex items-center gap-2 rounded-full border border-line bg-canvas py-1 pr-3 pl-1 text-sm transition-[translate,border-color,background-color,color] duration-200 hover:-translate-y-0.5 hover:border-ink aria-pressed:border-ink aria-pressed:bg-ink aria-pressed:text-canvas"
                       >
                         <span
                           class:list={[
-                            'grid size-7 shrink-0 place-items-center rounded-md border border-ink font-mono text-[11px] font-bold text-ink',
-                            tone,
+                            'grid size-7 shrink-0 place-items-center rounded-full border border-line bg-surface-2 font-mono text-[11px] font-bold text-ink',
                           ]}
                           aria-hidden="true"
                         >
@@ -141,9 +160,9 @@ const groups = Object.entries(profile.skills).map(([group, skills], g) => ({
       </dl>
 
       <!-- Panel detail: elemen terpilih + daftar project -->
-      <aside class="sheet rounded-3xl p-5 lg:sticky lg:top-24" data-reveal>
+      <aside class="rounded-2xl border border-line bg-surface/80 p-5 backdrop-blur lg:sticky lg:top-24">
         <div class="flex items-center gap-4">
-          <div class="flex size-20 shrink-0 flex-col justify-between rounded-2xl bg-ink p-2.5 text-canvas" aria-hidden="true">
+          <div class="flex size-20 shrink-0 flex-col justify-between rounded-2xl bg-linear-to-br from-accent-from to-accent-to p-2.5 text-white" aria-hidden="true">
             <span class="font-mono text-[10px] opacity-70" data-stack-number>—</span>
             <span class="text-3xl leading-none font-extrabold tracking-tight" data-stack-symbol>?</span>
           </div>
@@ -152,7 +171,7 @@ const groups = Object.entries(profile.skills).map(([group, skills], g) => ({
             <span class="block text-xs text-muted" data-stack-group>{tr.pickHint}</span>
           </div>
         </div>
-        <p class="hand mt-5 text-lg" aria-live="polite" data-stack-status>{tr.allProjects}</p>
+        <p class="mt-5 text-sm font-semibold" aria-live="polite" data-stack-status>{tr.allProjects}</p>
         <ul class="mt-2">
           {
             projects.map((p) => (
@@ -160,7 +179,7 @@ const groups = Object.entries(profile.skills).map(([group, skills], g) => ({
                 <a
                   href={localePath(lang, `/projects/${p.id}`)}
                   data-stack-project={p.id}
-                  class="flex items-center justify-between gap-3 border-b border-dashed border-line px-1 py-2 text-sm transition-[opacity,color] duration-200 hover:text-accent data-[dim]:opacity-30 data-[hl]:font-semibold data-[hl]:text-accent"
+                  class="flex items-center justify-between gap-3 border-b border-line px-1 py-2 text-sm transition-[opacity,color] duration-200 hover:text-accent data-[dim]:opacity-30 data-[hl]:font-semibold data-[hl]:text-accent"
                 >
                   <span>{p.data.title}</span>
                   <span class="shrink-0 font-mono text-[11px] text-muted">{p.data.category}</span>
