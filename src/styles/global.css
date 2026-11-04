@@ -19,91 +19,107 @@
   --color-muted: var(--muted);
   --color-accent: var(--accent);
   --color-accent-ink: var(--accent-ink);
+  --color-accent-from: var(--accent-from);
+  --color-accent-to: var(--accent-to);
+  --color-accent-soft: var(--accent-soft);
+  /* Sisa tema notebook; dihapus setelah semua section pindah */
   --color-pen: var(--pen);
   --color-hl: var(--hl);
   --color-note: var(--note);
   --color-pen-soft: var(--pen-soft);
-  --color-accent-soft: var(--accent-soft);
+
+  /* Variabel shadcn/Magic UI dipetakan ke token semantik */
+  --color-background: var(--canvas);
+  --color-foreground: var(--ink);
+  --color-card: var(--surface);
+  --color-card-foreground: var(--ink);
+  --color-popover: var(--surface);
+  --color-popover-foreground: var(--ink);
+  --color-primary: var(--ink);
+  --color-primary-foreground: var(--canvas);
+  --color-secondary: var(--surface-2);
+  --color-secondary-foreground: var(--ink);
+  --color-muted-foreground: var(--muted);
+  --color-border: var(--line);
+  --color-input: var(--line);
+  --color-ring: var(--accent);
 }
 
 :root {
-  --canvas: #f6f8fb;
+  --canvas: #fafafa;
   --surface: #ffffff;
-  --surface-2: #edf1f6;
-  --line: #d3dbe5;
-  --ink: #16202c;
-  --muted: #566476;
-  --accent: #0a8f67;
+  --surface-2: #f4f4f5;
+  --line: #e4e4e7;
+  --ink: #09090b;
+  --muted: #71717a;
+  --accent: #6d5efc;
   --accent-ink: #ffffff;
+  --accent-from: #6d5efc;
+  --accent-to: #22d3ee;
+  --accent-soft: #eeecff;
 
-  /* Buku catatan: grid kertas, tinta pena, stabilo, sticky note */
-  --grid: #e4eaf2;
-  --pen: #2f5bd3;
-  --hl: #ffe45c;
-  --note: #fff3a6;
-  --pen-soft: #e2e9fb;
-  --accent-soft: #d9f2e8;
+  --pen: #6d5efc;
+  --hl: #eeecff;
+  --note: #f4f4f5;
+  --pen-soft: #f4f4f5;
 
-  /* Bayangan kartu: offset ke bawah, lembut */
-  --shadow-sheet: 0 1px 2px rgb(16 32 44 / 0.05), 0 18px 36px -26px rgb(16 32 44 / 0.35);
-  --shadow-lift: 0 2px 4px rgb(16 32 44 / 0.06), 0 30px 50px -28px rgb(16 32 44 / 0.45);
+  /* Nama variabel shadcn untuk komponen registry yang memakai var() langsung */
+  --background: var(--canvas);
+  --foreground: var(--ink);
+  --border: var(--line);
+  --primary: var(--ink);
+  --primary-foreground: var(--canvas);
+  --muted-foreground: var(--muted);
+  --ring: var(--accent);
+  --radius: 0.75rem;
+
+  /* Bayangan halus netral */
+  --shadow-sheet: 0 1px 2px rgb(9 9 11 / 0.04), 0 8px 24px -16px rgb(9 9 11 / 0.18);
+  --shadow-lift: 0 1px 2px rgb(9 9 11 / 0.05), 0 20px 40px -20px rgb(9 9 11 / 0.28);
 
   /* Syntax highlighting */
-  --tok-kw: #0a8f67;
-  --tok-type: #2f6690;
-  --tok-str: #8a5a12;
-  --tok-num: #a0452d;
-  --tok-prop: #0e1a22;
-  --tok-com: #6b7c8c;
-  --tok-punct: #55677a;
+  --tok-kw: #6d5efc;
+  --tok-type: #0e7490;
+  --tok-str: #a16207;
+  --tok-num: #c2410c;
+  --tok-prop: #09090b;
+  --tok-com: #71717a;
+  --tok-punct: #52525b;
 }
 
-/* .inverse = panel malam (section Projects): token gelap juga di mode terang */
-.dark,
+.dark {
+  --canvas: #09090b;
+  --surface: #111113;
+  --surface-2: #18181b;
+  --line: #27272a;
+  --ink: #fafafa;
+  --muted: #a1a1aa;
+  --accent: #8b7dff;
+  --accent-ink: #0b0820;
+  --accent-from: #8b7dff;
+  --accent-to: #22d3ee;
+  --accent-soft: #1c1838;
+
+  --pen: #8b7dff;
+  --hl: #1c1838;
+  --note: #18181b;
+  --pen-soft: #111113;
+
+  --shadow-sheet: 0 1px 0 rgb(255 255 255 / 0.03) inset, 0 16px 40px -24px rgb(0 0 0 / 0.9);
+  --shadow-lift: 0 1px 0 rgb(255 255 255 / 0.05) inset, 0 28px 56px -28px rgb(0 0 0 / 0.95);
+
+  --tok-kw: #a99dff;
+  --tok-type: #67e8f9;
+  --tok-str: #fcd34d;
+  --tok-num: #fdba74;
+  --tok-prop: #fafafa;
+  --tok-com: #71717a;
+  --tok-punct: #a1a1aa;
+}
+
+/* Sementara: panel .inverse tidak lagi berbeda (dihapus di akhir revamp) */
 .inverse {
-  --canvas: #0d1318;
-  --surface: #121a21;
-  --surface-2: #17222b;
-  --line: #22303b;
-  --ink: #e2e8ee;
-  --muted: #8696a5;
-  --accent: #3dd6a3;
-  --accent-ink: #062a1e;
-
-  --grid: #18222b;
-  --pen: #8fb0ff;
-  --hl: rgb(255 214 10 / 0.32);
-  --note: #2e2b1c;
-  --pen-soft: #18223d;
-  --accent-soft: #10302a;
-
-  --shadow-sheet: 0 1px 0 rgb(255 255 255 / 0.03) inset, 0 24px 48px -30px rgb(0 0 0 / 0.85);
-  --shadow-lift: 0 1px 0 rgb(255 255 255 / 0.05) inset, 0 32px 60px -30px rgb(0 0 0 / 0.95);
-
-  --tok-kw: #3dd6a3;
-  --tok-type: #8fbfe0;
-  --tok-str: #dcc9a0;
-  --tok-num: #e7a77d;
-  --tok-prop: #e2e8ee;
-  --tok-com: #637484;
-  --tok-punct: #8696a5;
-}
-
-/* Panel malam di mode gelap dibuat lebih dalam supaya tetap beda dari halaman */
-.dark .inverse {
-  --canvas: #070b0f;
-  --surface: #0f161c;
-  --surface-2: #141e26;
-}
-.inverse {
-  color-scheme: dark;
   color: var(--ink);
-  background-color: var(--canvas);
-  background-image:
-    linear-gradient(var(--grid) 1px, transparent 1px),
-    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
-  background-size: 28px 28px;
-  background-position: -1px -1px;
 }
 
 /* Kartu: garis tipis + bayangan lembut */
@@ -138,12 +154,6 @@
   }
   body {
     @apply bg-canvas text-ink antialiased;
-    /* Kertas grid buku catatan */
-    background-image:
-      linear-gradient(var(--grid) 1px, transparent 1px),
-      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
-    background-size: 28px 28px;
-    background-position: -1px -1px;
   }
   h1,
   h2,
