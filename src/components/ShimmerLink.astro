@@ -14,7 +14,7 @@ const { href, class: className, external } = Astro.props;
   href={href}
   target={external ? '_blank' : undefined}
   rel={external ? 'noopener noreferrer' : undefined}
-  style="--spread: 90deg; --shimmer-color: #ffffff; --radius: 9999px; --speed: 3s; --cut: 0.08em; --bg: linear-gradient(135deg, var(--accent-from), color-mix(in oklab, var(--accent-from) 55%, var(--accent-to)))"
+  style="--spread: 90deg; --shimmer-color: #ffffff; --radius: 9999px; --speed: 3s; --cut: 0.08em; --bg: linear-gradient(135deg, #5b4ee6, #3f3cc0)"
   class:list={[
     'group relative z-0 inline-flex cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-(--radius) border border-white/10 px-6 py-3 text-sm font-semibold whitespace-nowrap text-white [background:var(--bg)]',
     'transform-gpu transition-transform duration-300 ease-in-out hover:-translate-y-0.5 active:translate-y-px',

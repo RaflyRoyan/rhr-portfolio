@@ -1,5 +1,5 @@
 import { Copy, FolderGit2, Mail, MessageCircle } from 'lucide-react';
-import { useReducedMotion } from 'motion/react';
+import { useReducedMotionSafe } from '@/lib/use-reduced-motion-safe';
 import { Dock, DockIcon } from '@/components/ui/dock';
 
 const ICONS = { mail: Mail, whatsapp: MessageCircle, copy: Copy, projects: FolderGit2 };
@@ -15,7 +15,7 @@ export interface DockItem {
 
 /** Dock Magic UI berisi tautan kontak. Item tanpa href menjadi tombol. */
 export default function ContactDock({ items }: { items: DockItem[] }) {
-  const reduced = useReducedMotion() ?? false;
+  const reduced = useReducedMotionSafe();
   const cls =
     'grid size-full place-items-center rounded-full text-muted transition-colors hover:bg-surface-2 hover:text-ink focus-visible:text-ink';
   return (

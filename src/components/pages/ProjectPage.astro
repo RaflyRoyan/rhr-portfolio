@@ -7,7 +7,6 @@ import ProjectStatus from '../ProjectStatus.astro';
 import Toc from '../project/Toc.astro';
 import Highlights from '../project/Highlights.astro';
 import Gallery from '../project/Gallery.astro';
-import Reveal from '../islands/Reveal';
 import GlowCard from '../islands/GlowCard';
 import { categorySlug, type getProjectPaths } from '../../lib/collections';
 import { formatMonth, getLang, localePath, t } from '../../i18n';
@@ -29,14 +28,12 @@ const tr = t(lang).projectPage;
       <div class="min-w-0 max-w-3xl">
         <!-- Header: cover, judul, dan tech chips berbagi transition:name dengan kartu -->
         <header>
-          <Reveal client:load>
           <ProjectCover project={project} size="page" />
           <h1 class="mt-8 text-4xl font-extrabold tracking-tight text-balance sm:text-5xl" transition:name={`project-title-${project.id}`}>
             <span>{title}</span>
           </h1>
           <p class="mt-4 text-lg leading-8 text-muted">{summary}</p>
 
-          </Reveal>
           <dl class="mt-8 grid grid-cols-2 gap-x-6 gap-y-4 rounded-2xl border border-line bg-surface/80 p-5 backdrop-blur sm:grid-cols-4">
             <div>
               <dt class="font-mono text-xs text-muted">{tr.category}</dt>

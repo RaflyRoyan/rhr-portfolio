@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
+import { AnimatePresence, motion } from 'motion/react';
+import { useReducedMotionSafe } from '@/lib/use-reduced-motion-safe';
 
 /**
  * Pola word-rotate Magic UI sebagai <span> (komponen registry merender <h1>, sehingga ada h1 ganda).
@@ -7,7 +8,7 @@ import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
  */
 export default function RoleRotate({ words, duration = 2400, className }: { words: string[]; duration?: number; className?: string }) {
   const [index, setIndex] = useState(0);
-  const reduced = useReducedMotion();
+  const reduced = useReducedMotionSafe();
 
   useEffect(() => {
     if (reduced || words.length < 2) return;

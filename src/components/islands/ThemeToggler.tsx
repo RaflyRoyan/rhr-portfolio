@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { AnimatedThemeToggler } from '@/components/ui/animated-theme-toggler';
+import { useReducedMotionSafe } from '@/lib/use-reduced-motion-safe';
 
 type Theme = 'light' | 'dark';
 
@@ -12,6 +13,7 @@ const current = (): Theme => (document.documentElement.classList.contains('dark'
  */
 export default function ThemeToggler({ label }: { label: string }) {
   const [theme, setTheme] = useState<Theme>('light');
+  const reduced = useReducedMotionSafe();
 
   useEffect(() => {
     setTheme(current());
@@ -30,6 +32,7 @@ export default function ThemeToggler({ label }: { label: string }) {
   return (
     <AnimatedThemeToggler
       theme={theme}
+      duration={reduced ? 0 : 400}
       onThemeChange={onThemeChange}
       aria-label={label}
       title={label}

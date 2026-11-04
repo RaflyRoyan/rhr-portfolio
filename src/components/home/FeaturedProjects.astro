@@ -39,9 +39,9 @@ const firstBig = tiles.find((tile) => tile.big)?.project.id;
 
     <BentoGrid className="auto-rows-auto grid-flow-dense grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
       {
-        tiles.map(({ project, big }, i) =>
+        tiles.map(({ project, big }) =>
           big ? (
-            <Reveal client:visible delay={0.04 * (i % 3)} className="relative sm:col-span-2">
+            <div class="relative sm:col-span-2">
               <GlowCard client:visible className="h-full">
                 <a href={localePath(lang, `/projects/${project.id}`)} class="group grid h-full gap-6 p-4 sm:grid-cols-[1.05fr_1fr] sm:gap-8 sm:p-6">
                   <div class="flex flex-col">
@@ -76,15 +76,15 @@ const firstBig = tiles.find((tile) => tile.big)?.project.id;
                 </a>
               </GlowCard>
               {project.id === firstBig && (
-                <div class="pointer-events-none absolute inset-0 z-50 rounded-2xl" aria-hidden="true">
+                <div class="pointer-events-none absolute inset-0 z-50 rounded-2xl motion-reduce:hidden" aria-hidden="true">
                   <BorderBeam client:visible size={120} duration={8} colorFrom="var(--accent-from)" colorTo="var(--accent-to)" borderWidth={1.5} />
                 </div>
               )}
-            </Reveal>
+            </div>
           ) : (
-            <Reveal client:visible delay={0.04 * (i % 3)} className="h-full">
+            <div class="h-full">
               <ProjectCard project={project} />
-            </Reveal>
+            </div>
           ),
         )
       }

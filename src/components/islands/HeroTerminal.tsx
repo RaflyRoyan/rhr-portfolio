@@ -1,4 +1,4 @@
-import { useReducedMotion } from 'motion/react';
+import { useReducedMotionSafe } from '@/lib/use-reduced-motion-safe';
 import { AnimatedSpan, Terminal, TypingAnimation } from '@/components/ui/terminal';
 
 export interface TerminalLine {
@@ -11,7 +11,7 @@ export interface TerminalLine {
  * jadi disembunyikan dari pembaca layar. Dengan reduced motion semua baris tampil tanpa efek ketik.
  */
 export default function HeroTerminal({ title, lines }: { title: string; lines: TerminalLine[] }) {
-  const reduced = useReducedMotion();
+  const reduced = useReducedMotionSafe();
 
   return (
     <div aria-hidden="true" className="relative">

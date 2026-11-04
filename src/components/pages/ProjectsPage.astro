@@ -2,7 +2,6 @@
 // Daftar semua project, dipakai oleh /projects dan /en/projects. Bahasa dibaca dari URL.
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import ProjectCard from '../ProjectCard.astro';
-import Reveal from '../islands/Reveal';
 import { PROJECT_CATEGORIES } from '../../content.config';
 import { categorySlug, getProjects } from '../../lib/collections';
 import { getLang, t } from '../../i18n';
@@ -61,16 +60,14 @@ const filters = [
 
     <div class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {
-        projects.map((project, i) => (
+        projects.map((project) => (
           <div
             class="flex"
             data-project-item
             data-category={categorySlug(project.data.category)}
             data-search={[project.data.title, project.data.summary, project.data.category, ...project.data.tech].join(' ').toLowerCase()}
           >
-            <Reveal client:visible delay={0.04 * Math.min(i, 8)} className="w-full">
-              <ProjectCard project={project} />
-            </Reveal>
+            <ProjectCard project={project} />
           </div>
         ))
       }

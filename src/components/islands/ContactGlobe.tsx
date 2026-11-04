@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useReducedMotion } from 'motion/react';
+import { useReducedMotionSafe } from '@/lib/use-reduced-motion-safe';
 import type { COBEOptions } from 'cobe';
 import { Globe } from '@/components/ui/globe';
 
@@ -12,7 +12,7 @@ const isDark = () => document.documentElement.classList.contains('dark');
  * Globe registry selalu berputar, jadi dengan reduced motion diganti penanda statis.
  */
 export default function ContactGlobe({ label }: { label: string }) {
-  const reduced = useReducedMotion();
+  const reduced = useReducedMotionSafe();
   const [dark, setDark] = useState(false);
 
   useEffect(() => {
