@@ -1,34 +1,26 @@
 ---
-import Doodle, { type DoodleName } from './Doodle.astro';
 import Reveal from './islands/Reveal';
 
 interface Props {
   title: string;
-  /** Satu kalimat penjelas, tampil sebagai catatan tulisan tangan di bawah judul. */
+  /** Satu kalimat penjelas di bawah judul. */
   note?: string;
-  /** Coretan kecil di samping judul. */
-  doodle?: DoodleName;
+  /** Label kecil di atas judul (mis. nomor atau kategori section). */
+  eyebrow?: string;
 }
 
-const { title, note, doodle } = Astro.props;
+const { title, note, eyebrow } = Astro.props;
 ---
 
-<div class="mb-12 max-w-2xl">
-  <Reveal client:visible>
-  <div class="flex items-end gap-3">
-    <h2 class="relative text-3xl font-bold tracking-tight sm:text-4xl">
-      {title}
-      <Doodle name="underline" class="absolute -bottom-3 left-0 h-3 w-[min(100%,14rem)] text-pen" stroke={4} delay={0.25} />
-    </h2>
-    {doodle && <Doodle name={doodle} class="bob mb-1 size-9 shrink-0 text-pen sm:size-11" delay={0.5} />}
-  </div>
-  </Reveal>
+<Reveal client:visible className="mb-12 max-w-2xl">
   {
-    note && (
-      <p class="hand mt-6 flex items-start gap-2 text-lg sm:text-xl" data-reveal>
-        <Doodle name="arrow-right" class="mt-1.5 h-4 w-8 shrink-0" delay={0.6} />
-        <span class="inline-block -rotate-1">{note}</span>
+    eyebrow && (
+      <p class="mb-3 inline-flex items-center gap-2 rounded-full border border-line bg-surface/70 px-3 py-1 font-mono text-xs text-muted">
+        <span class="size-1.5 rounded-full bg-linear-to-r from-accent-from to-accent-to" aria-hidden="true" />
+        {eyebrow}
       </p>
     )
   }
-</div>
+  <h2 class="text-3xl font-bold tracking-tight text-balance sm:text-5xl">{title}</h2>
+  {note && <p class="mt-4 text-lg leading-7 text-muted">{note}</p>}
+</Reveal>

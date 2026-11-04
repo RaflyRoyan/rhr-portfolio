@@ -46,5 +46,10 @@ export default defineConfig({
   },
   vite: {
     plugins: [tailwindcss()],
+    // Pre-bundle dependensi island sejak awal; kalau ditemukan belakangan, Vite dev
+    // mengoptimasi ulang dan React terduplikasi ("Invalid hook call")
+    optimizeDeps: {
+      include: ['react', 'react-dom', 'react-dom/client', 'react/jsx-runtime', 'react/jsx-dev-runtime', 'motion/react', 'lucide-react', 'next-themes'],
+    },
   },
 });

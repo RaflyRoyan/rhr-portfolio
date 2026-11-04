@@ -18,7 +18,7 @@ const counts = Object.fromEntries(tabs.map((t) => [t.value, t.value === 'all' ? 
 
 <section id="updates" class="relative border-y border-line bg-pen-soft py-24 sm:py-32">
   <div class="mx-auto w-full max-w-6xl px-4 sm:px-6" data-updates data-limit={LIMIT}>
-    <SectionHeading title={tr.title} doodle="pencil" note={tr.note} />
+    <SectionHeading title={tr.title} note={tr.note} />
 
     <div class="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0" data-reveal>
       <div class="inline-flex gap-2" role="group" aria-label={tr.filter}>
