@@ -1,61 +1,59 @@
 ---
-import Doodle from '../Doodle.astro';
-import { getLang, getProfile, t } from '../../i18n';
+import ShimmerLink from '../ShimmerLink.astro';
+import Reveal from '../islands/Reveal';
+import ContactDock from '../islands/ContactDock';
+import ContactGlobe from '../islands/ContactGlobe';
+import { getLang, getProfile, localePath, t } from '../../i18n';
 
 const lang = getLang(Astro.url);
 const tr = t(lang).contact;
 const { email, whatsapp, phone, location, cta } = getProfile(lang).contact;
+const dockItems = [
+  { icon: 'mail' as const, label: tr.email, href: `mailto:${email}` },
+  { icon: 'whatsapp' as const, label: `${tr.whatsapp} (${phone})`, href: whatsapp, external: true },
+  { icon: 'copy' as const, label: tr.copy, copyEmail: email },
+  { icon: 'projects' as const, label: tr.projects, href: localePath(lang, '/projects') },
+];
 ---
 
 <section id="contact" class="relative px-4 py-24 sm:px-6 sm:py-32">
-  <div class="relative mx-auto w-full max-w-6xl overflow-hidden rounded-[2rem] bg-ink shadow-(--shadow-lift) px-6 py-14 text-canvas sm:px-12 sm:py-20" data-reveal>
-    <!-- Pesawat kertas + jejak putus-putus yang terbang ke kanan atas -->
-    <div class="pointer-events-none absolute inset-0 hidden lg:block" aria-hidden="true">
-      <svg class="trail absolute top-16 right-36 h-44 w-[26rem] text-amber-300/70 dark:text-amber-600/70" viewBox="0 0 300 140" fill="none" data-reveal>
-        <path
-          d="M4 132 C50 124 70 70 118 86 C160 100 150 136 116 122 C88 110 128 48 200 40 C240 36 262 26 286 12"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-dasharray="6 7"
-          stroke-linecap="round"></path>
-      </svg>
-      <Doodle name="plane" class="bob absolute top-8 right-12 size-28 rotate-6 text-amber-300 dark:text-amber-600" stroke={3} delay={1.2} />
-      <Doodle name="sparkle" class="bob absolute right-[38%] bottom-12 size-10 text-accent [--bob-delay:1s]" stroke={5} delay={1.4} />
-    </div>
+  <Reveal client:visible className="relative mx-auto w-full max-w-6xl">
+    <div class="relative overflow-hidden rounded-[2rem] border border-line bg-surface/80 px-6 py-14 shadow-(--shadow-lift) backdrop-blur sm:px-12 sm:py-16">
+      <span
+        class="pointer-events-none absolute -top-40 -left-40 size-96 rounded-full bg-[radial-gradient(circle,color-mix(in_oklab,var(--accent-from)_22%,transparent),transparent_70%)]"
+        aria-hidden="true"></span>
 
-    <div class="relative max-w-3xl">
-      <p class="hand -rotate-2 text-2xl text-amber-300 dark:text-amber-700">{tr.kicker}</p>
-      <h2 class="mt-3 text-[clamp(2.75rem,7vw,5.5rem)] leading-[0.95] font-extrabold tracking-[-0.04em]">{tr.title}</h2>
-      <p class="mt-6 max-w-xl text-lg leading-8 text-canvas/75">{cta}</p>
+      <div class="relative grid items-center gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,24rem)]">
+        <div class="max-w-2xl">
+          <p class="font-mono text-sm text-accent">{tr.kicker}</p>
+          <h2 class="mt-3 text-[clamp(2.5rem,6vw,4.75rem)] leading-[0.95] font-extrabold tracking-[-0.04em]">{tr.title}</h2>
+          <p class="mt-6 max-w-xl text-lg leading-8 text-muted">{cta}</p>
 
-      <div class="mt-10 rounded-full bg-canvas p-2 text-ink">
-        <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
-          <a href={`mailto:${email}`} class="min-w-0 flex-1 truncate rounded-full px-4 py-3 font-mono text-base hover:text-accent sm:text-lg">
-            <span class="text-accent" aria-hidden="true">❯ </span>{email}
-          </a>
-          <button
-            type="button"
-            data-copy-email={email}
-            class="rounded-full bg-accent px-6 py-3 text-sm font-semibold text-accent-ink transition-opacity hover:opacity-90"
-          >
-            {tr.copy}
-          </button>
+          <div class="mt-8 flex flex-wrap items-center gap-3">
+            <ShimmerLink href={`mailto:${email}`} class="max-w-full font-mono">
+              <span class="truncate">{email}</span>
+            </ShimmerLink>
+            <button
+              type="button"
+              data-copy-email={email}
+              class="rounded-full border border-line bg-surface px-5 py-3 text-sm font-semibold transition-colors hover:border-muted"
+            >
+              {tr.copy}
+            </button>
+          </div>
+
+          <div class="mt-8 flex flex-wrap items-center gap-x-6 gap-y-4">
+            <ContactDock client:visible items={dockItems} />
+            <span class="text-sm text-muted">{location}</span>
+          </div>
+        </div>
+
+        <div class="relative mx-auto aspect-square w-full max-w-[22rem] lg:max-w-[24rem]">
+          <ContactGlobe client:visible label={tr.globe} />
         </div>
       </div>
-
-      <div class="mt-6 flex flex-wrap items-center gap-x-6 gap-y-3 text-sm">
-        <a
-          href={whatsapp}
-          target="_blank"
-          rel="noopener noreferrer"
-          class="rounded-full border border-canvas/40 px-5 py-2.5 font-semibold transition-colors hover:border-canvas hover:bg-canvas hover:text-ink"
-        >
-          {tr.whatsapp} ({phone})
-        </a>
-        <span class="text-canvas/60">{location}</span>
-      </div>
     </div>
-  </div>
+  </Reveal>
 </section>
 
 <script>

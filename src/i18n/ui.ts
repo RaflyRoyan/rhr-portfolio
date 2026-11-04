@@ -77,6 +77,9 @@ const id = {
     title: 'Mari bekerja sama',
     copy: 'Salin email',
     whatsapp: 'Chat lewat WhatsApp',
+    email: 'Kirim email',
+    projects: 'Lihat project',
+    globe: 'Peta dunia dengan penanda di Surabaya',
   },
   projectsPage: {
     title: 'Projects',
@@ -195,6 +198,9 @@ const en: UI = {
     title: "Let's work together",
     copy: 'Copy email',
     whatsapp: 'Chat on WhatsApp',
+    email: 'Send an email',
+    projects: 'View projects',
+    globe: 'World map with a marker on Surabaya',
   },
   projectsPage: {
     title: 'Projects',
