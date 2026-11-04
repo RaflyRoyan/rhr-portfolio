@@ -7,6 +7,8 @@ import ProjectStatus from '../ProjectStatus.astro';
 import Toc from '../project/Toc.astro';
 import Highlights from '../project/Highlights.astro';
 import Gallery from '../project/Gallery.astro';
+import Reveal from '../islands/Reveal';
+import GlowCard from '../islands/GlowCard';
 import { categorySlug, type getProjectPaths } from '../../lib/collections';
 import { formatMonth, getLang, localePath, t } from '../../i18n';
 
@@ -21,19 +23,21 @@ const tr = t(lang).projectPage;
 
 <BaseLayout title={title} description={summary}>
   <div class="mx-auto w-full max-w-6xl px-4 py-10 sm:px-6 sm:py-14">
-    <a href={localePath(lang, '/#projects')} class="font-mono text-sm text-muted hover:text-accent">cd ..</a>
+    <a href={localePath(lang, '/#projects')} class="inline-flex items-center gap-1.5 rounded-full border border-line bg-surface/70 px-3.5 py-1.5 font-mono text-xs text-muted backdrop-blur transition-colors hover:border-muted hover:text-ink">← cd ..</a>
 
     <div class="mt-6 grid gap-12 lg:grid-cols-[minmax(0,1fr)_17rem] lg:gap-16">
       <div class="min-w-0 max-w-3xl">
         <!-- Header: cover, judul, dan tech chips berbagi transition:name dengan kartu -->
         <header>
+          <Reveal client:load>
           <ProjectCover project={project} size="page" />
-          <h1 class="mt-8 text-3xl font-semibold tracking-tight text-balance sm:text-4xl" transition:name={`project-title-${project.id}`}>
+          <h1 class="mt-8 text-4xl font-extrabold tracking-tight text-balance sm:text-5xl" transition:name={`project-title-${project.id}`}>
             <span>{title}</span>
           </h1>
           <p class="mt-4 text-lg leading-8 text-muted">{summary}</p>
 
-          <dl class="mt-8 grid grid-cols-2 gap-x-6 gap-y-4 border-y border-line py-5 sm:grid-cols-4">
+          </Reveal>
+          <dl class="mt-8 grid grid-cols-2 gap-x-6 gap-y-4 rounded-2xl border border-line bg-surface/80 p-5 backdrop-blur sm:grid-cols-4">
             <div>
               <dt class="font-mono text-xs text-muted">{tr.category}</dt>
               <dd class="mt-1 text-sm">
@@ -58,7 +62,7 @@ const tr = t(lang).projectPage;
             tech.length > 0 && (
               <ul class="mt-5 flex flex-wrap gap-1.5" aria-label={tr.tech} transition:name={`project-tech-${project.id}`}>
                 {tech.map((item) => (
-                  <li class="rounded border border-line px-2 py-0.5 font-mono text-xs text-muted">{item}</li>
+                  <li class="rounded-md border border-line bg-surface-2 px-2 py-0.5 font-mono text-xs text-muted">{item}</li>
                 ))}
               </ul>
             )
@@ -68,7 +72,7 @@ const tr = t(lang).projectPage;
         <!-- Mobile: daftar isi + sorotan di atas body (sidebar disembunyikan) -->
         <div class="mt-10 space-y-4 lg:hidden">
           <Toc headings={headings} variant="inline" />
-          <Highlights items={highlights} class="rounded-xl border border-line bg-surface p-5" />
+          <Highlights items={highlights} class="rounded-2xl border border-line bg-surface p-5" />
         </div>
 
         <article class="prose-project mt-12">
@@ -83,7 +87,7 @@ const tr = t(lang).projectPage;
               <h2 id="related-heading" class="text-xl font-semibold tracking-tight">
                 {tr.related}
               </h2>
-              <ol class="mt-6 divide-y divide-line border-y border-line">
+              <ol class="mt-6 divide-y divide-line rounded-2xl border border-line bg-surface/80 px-5 backdrop-blur">
                 {related.map((u) => (
                   <li class="grid gap-x-6 gap-y-1 py-5 sm:grid-cols-[6rem_1fr]">
                     <time datetime={u.data.date.toISOString()} class="font-mono text-xs leading-6 text-muted">
@@ -116,20 +120,20 @@ const tr = t(lang).projectPage;
       <div class="grid gap-3 sm:grid-cols-2">
         {
           prev ? (
-            <a href={localePath(lang, `/projects/${prev.id}`)} class="rounded-xl border border-line p-5 transition-colors hover:border-muted">
+            <GlowCard client:visible><a href={localePath(lang, `/projects/${prev.id}`)} class="block p-5">
               <span class="font-mono text-xs text-muted">{tr.prev}</span>
               <span class="mt-1 block font-medium">{prev.data.title}</span>
-            </a>
+            </a></GlowCard>
           ) : (
             <span class="hidden sm:block" />
           )
         }
         {
           next && (
-            <a href={localePath(lang, `/projects/${next.id}`)} class="rounded-xl border border-line p-5 text-right transition-colors hover:border-muted">
+            <GlowCard client:visible><a href={localePath(lang, `/projects/${next.id}`)} class="block p-5 text-right">
               <span class="font-mono text-xs text-muted">{tr.next}</span>
               <span class="mt-1 block font-medium">{next.data.title}</span>
-            </a>
+            </a></GlowCard>
           )
         }
       </div>

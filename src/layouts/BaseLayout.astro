@@ -1,7 +1,5 @@
 ---
 import '@fontsource-variable/bricolage-grotesque/standard.css';
-import '@fontsource/kalam/400.css';
-import '@fontsource/kalam/700.css';
 import '@fontsource-variable/jetbrains-mono';
 import '../styles/global.css';
 import { ClientRouter } from 'astro:transitions';
@@ -79,13 +77,6 @@ const ogImage = new URL(image, Astro.site);
         className="text-line [mask-image:radial-gradient(900px_circle_at_50%_0%,white,transparent)]"
       />
     </div>
-    <!-- Filter garis tangan untuk semua .doodle -->
-    <svg width="0" height="0" class="absolute" aria-hidden="true">
-      <filter id="sketchy">
-        <feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="7"></feTurbulence>
-        <feDisplacementMap in="SourceGraphic" scale="2.4"></feDisplacementMap>
-      </filter>
-    </svg>
     <a
       href="#main"
       class="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:rounded-md focus:bg-accent focus:px-3 focus:py-2 focus:text-accent-ink"
@@ -108,35 +99,3 @@ const ogImage = new URL(image, Astro.site);
   </body>
 </html>
 
-<script>
-  import { onPageLoad, prefersReducedMotion } from '../scripts/lifecycle';
-
-  // Reveal on scroll untuk semua elemen [data-reveal] dan coretan [data-draw]
-  onPageLoad(() => {
-    const items = document.querySelectorAll<HTMLElement>('[data-reveal], [data-draw]');
-    if (prefersReducedMotion() || !('IntersectionObserver' in window)) {
-      items.forEach((el) => el.classList.add('is-visible'));
-      return;
-    }
-    const io = new IntersectionObserver(
-      (entries) => {
-        // Elemen yang masuk bersamaan muncul bertahap; jeda dihapus setelahnya supaya hover tidak ikut tertunda
-        let order = 0;
-        for (const entry of entries) {
-          if (!entry.isIntersecting) continue;
-          const el = entry.target as HTMLElement;
-          if (el.hasAttribute('data-reveal') && order > 0) {
-            el.style.setProperty('--reveal-delay', `${Math.min(order, 6) * 80}ms`);
-            el.addEventListener('transitionend', () => el.style.removeProperty('--reveal-delay'), { once: true });
-          }
-          if (el.hasAttribute('data-reveal')) order++;
-          el.classList.add('is-visible');
-          io.unobserve(el);
-        }
-      },
-      { rootMargin: '0px 0px -10% 0px' },
-    );
-    items.forEach((el) => io.observe(el));
-    return () => io.disconnect();
-  });
-</script>

@@ -10,7 +10,6 @@ import TechStack from '../home/TechStack.astro';
 import Updates from '../home/Updates.astro';
 import Education from '../home/Education.astro';
 import Contact from '../home/Contact.astro';
-import InkTrail from '../home/InkTrail.astro';
 import { getProjects, getUpdates } from '../../lib/collections';
 import { getLang, getProfile, t } from '../../i18n';
 
@@ -28,7 +27,6 @@ const stats = [
 
 <BaseLayout>
   <div class="relative">
-    <InkTrail />
     <Hero stats={stats} />
     <About />
     <FeaturedProjects projects={projects} />

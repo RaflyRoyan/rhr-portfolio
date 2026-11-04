@@ -6,7 +6,6 @@
 @theme {
   --font-sans: 'Bricolage Grotesque Variable', ui-sans-serif, system-ui, sans-serif;
   --font-mono: 'JetBrains Mono Variable', ui-monospace, SFMono-Regular, monospace;
-  --font-hand: 'Kalam', 'Comic Sans MS', cursive;
 }
 
 /* Token warna; nilai berganti antara light dan dark */
@@ -22,11 +21,6 @@
   --color-accent-from: var(--accent-from);
   --color-accent-to: var(--accent-to);
   --color-accent-soft: var(--accent-soft);
-  /* Sisa tema notebook; dihapus setelah semua section pindah */
-  --color-pen: var(--pen);
-  --color-hl: var(--hl);
-  --color-note: var(--note);
-  --color-pen-soft: var(--pen-soft);
 
   /* Variabel shadcn/Magic UI dipetakan ke token semantik */
   --color-background: var(--canvas);
@@ -109,10 +103,6 @@
   --accent-to: #22d3ee;
   --accent-soft: #eeecff;
 
-  --pen: #6d5efc;
-  --hl: #eeecff;
-  --note: #f4f4f5;
-  --pen-soft: #f4f4f5;
 
   /* Nama variabel shadcn untuk komponen registry yang memakai var() langsung */
   --background: var(--canvas);
@@ -151,10 +141,6 @@
   --accent-to: #22d3ee;
   --accent-soft: #1c1838;
 
-  --pen: #8b7dff;
-  --hl: #1c1838;
-  --note: #18181b;
-  --pen-soft: #111113;
 
   --shadow-sheet: 0 1px 0 rgb(255 255 255 / 0.03) inset, 0 16px 40px -24px rgb(0 0 0 / 0.9);
   --shadow-lift: 0 1px 0 rgb(255 255 255 / 0.05) inset, 0 28px 56px -28px rgb(0 0 0 / 0.95);
@@ -166,28 +152,6 @@
   --tok-prop: #fafafa;
   --tok-com: #71717a;
   --tok-punct: #a1a1aa;
-}
-
-/* Sementara: panel .inverse tidak lagi berbeda (dihapus di akhir revamp) */
-.inverse {
-  color: var(--ink);
-}
-
-/* Kartu: garis tipis + bayangan lembut */
-@utility sheet {
-  border: 1px solid var(--line);
-  background-color: var(--surface);
-  box-shadow: var(--shadow-sheet);
-}
-/* Kartu yang terangkat saat hover */
-@utility lift {
-  transition-property: translate, box-shadow, border-color, opacity;
-  transition-duration: 300ms;
-  transition-timing-function: cubic-bezier(0.2, 0.7, 0.2, 1);
-  &:hover {
-    translate: 0 -4px;
-    box-shadow: var(--shadow-lift);
-  }
 }
 
 @layer base {
@@ -220,155 +184,6 @@
   }
 }
 
-/* Reveal on scroll: hanya disembunyikan jika JS aktif */
-.js [data-reveal] {
-  opacity: 0;
-  transform: translateY(18px);
-  transition:
-    opacity 0.6s ease,
-    transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-  transition-delay: var(--reveal-delay, 0s);
-}
-.js [data-reveal].is-visible {
-  opacity: 1;
-  transform: none;
-}
-
-/* Coretan tangan: tiap path tergambar (stroke-dashoffset) saat [data-draw] terlihat */
-.doodle {
-  overflow: visible;
-  filter: url(#sketchy);
-}
-.js [data-draw] path {
-  stroke-dasharray: 1 2;
-  stroke-dashoffset: 1.05;
-  transition: stroke-dashoffset 0.9s cubic-bezier(0.6, 0.1, 0.3, 1);
-  transition-delay: calc(var(--draw-delay, 0s) + var(--i, 0) * 140ms);
-}
-.js [data-draw].is-visible path {
-  stroke-dashoffset: 0;
-}
-
-/* Stabilo: sapuan kuning di belakang teks */
-.highlight {
-  background: linear-gradient(transparent 58%, var(--hl) 58%, var(--hl) 90%, transparent 90%) no-repeat;
-  background-size: 100% 100%;
-  box-decoration-break: clone;
-  -webkit-box-decoration-break: clone;
-  padding-inline: 0.08em;
-}
-.js .highlight[data-draw] {
-  background-size: 0% 100%;
-  transition: background-size 0.8s cubic-bezier(0.6, 0.1, 0.3, 1) var(--draw-delay, 0s);
-}
-.js .highlight[data-draw].is-visible {
-  background-size: 100% 100%;
-}
-
-/* Catatan tulisan tangan */
-.hand {
-  font-family: var(--font-hand);
-  color: var(--pen);
-  line-height: 1.25;
-}
-
-/* Sticky note dengan selotip */
-.sticky-note {
-  position: relative;
-  box-shadow:
-    0 1px 1px rgb(0 0 0 / 0.04),
-    0 14px 28px -18px rgb(40 30 0 / 0.45);
-}
-.sticky-note::before {
-  content: '';
-  position: absolute;
-  top: -12px;
-  left: 50%;
-  width: 96px;
-  height: 24px;
-  translate: -50% 0;
-  rotate: -3deg;
-  background: color-mix(in oklab, var(--surface) 55%, transparent);
-  border-inline: 1px dashed color-mix(in oklab, var(--muted) 30%, transparent);
-  backdrop-filter: blur(1px);
-}
-
-/* Jejak putus-putus: dibuka dari kiri ke kanan (dash tidak bisa pakai trik dashoffset) */
-.js .trail[data-reveal] {
-  opacity: 1;
-  transform: none;
-  clip-path: inset(0 100% 0 0);
-  transition: clip-path 1.4s cubic-bezier(0.5, 0.1, 0.3, 1) 0.2s;
-}
-.js .trail[data-reveal].is-visible {
-  clip-path: inset(0 0 0 0);
-}
-
-/* Garis tinta di margin (InkTrail.astro) */
-.ink-path {
-  color: var(--pen);
-  opacity: 0.55;
-}
-.ink-nib {
-  fill: var(--pen);
-  stroke: var(--canvas);
-  stroke-width: 2;
-  transition: opacity 0.3s ease;
-}
-
-/* Doodle yang melayang pelan */
-.bob {
-  animation: bob 6s ease-in-out infinite alternate;
-  animation-delay: var(--bob-delay, 0s);
-}
-@keyframes bob {
-  from {
-    transform: translateY(0) rotate(var(--bob-rot, 0deg));
-  }
-  to {
-    transform: translateY(-8px) rotate(calc(var(--bob-rot, 0deg) * -1));
-  }
-}
-
-/* Pita teknologi berjalan; isi diduplikasi supaya loop mulus di -50% */
-.marquee {
-  display: flex;
-  width: max-content;
-  animation: marquee 38s linear infinite;
-}
-.marquee:hover {
-  animation-play-state: paused;
-}
-@keyframes marquee {
-  to {
-    transform: translateX(-50%);
-  }
-}
-
-/* Syntax highlighting kartu kode */
-.tok-kw { color: var(--tok-kw); }
-.tok-type { color: var(--tok-type); }
-.tok-str { color: var(--tok-str); }
-.tok-num { color: var(--tok-num); }
-.tok-prop { color: var(--tok-prop); }
-.tok-com { color: var(--tok-com); font-style: italic; }
-.tok-punct { color: var(--tok-punct); }
-
-.caret {
-  display: inline-block;
-  width: 0.55em;
-  height: 1.1em;
-  margin-left: 1px;
-  vertical-align: text-bottom;
-  background: var(--accent);
-  animation: caret-blink 1s steps(1) infinite;
-}
-@keyframes caret-blink {
-  50% {
-    opacity: 0;
-  }
-}
-
 /* Item yang muncul setelah filter */
 .enter {
   animation: enter 0.35s cubic-bezier(0.2, 0.7, 0.2, 1) both;
@@ -380,6 +195,11 @@
     transform: translateY(6px);
   }
 }
+@media (prefers-reduced-motion: reduce) {
+  .enter {
+    animation: none;
+  }
+}
 
 /* Grid halus untuk cover project yang dibuat otomatis */
 .cover-grid {
@@ -388,32 +208,6 @@
     linear-gradient(90deg, var(--line) 1px, transparent 1px);
   background-size: 24px 24px;
   background-position: -1px -1px;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .js [data-reveal] {
-    opacity: 1;
-    transform: none;
-    transition: none;
-  }
-  .caret,
-  .enter,
-  .bob,
-  .marquee {
-    animation: none;
-  }
-  .js [data-draw] path {
-    stroke-dashoffset: 0;
-    transition: none;
-  }
-  .js .highlight[data-draw] {
-    background-size: 100% 100%;
-    transition: none;
-  }
-  .js .trail[data-reveal] {
-    clip-path: none;
-    transition: none;
-  }
 }
 
 /* Tipografi body markdown project */
@@ -581,21 +375,6 @@ svg[id^='mermaid'] .edgeLabel rect {
   fill: var(--surface) !important;
 }
 
-/* Kalimat yang "terisi tinta" kata demi kata saat di-scroll (About.astro) */
-.js .ink-word {
-  opacity: 0.18;
-  transition: opacity 0.35s ease;
-}
-.js .ink-word[data-lit] {
-  opacity: 1;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .js .ink-word {
-    opacity: 1;
-    transition: none;
-  }
-}
 
 /* BlurFade (Magic UI) dirender opacity 0 saat SSR: tampilkan state akhir tanpa JS
    dan saat pengguna memilih reduced motion */
