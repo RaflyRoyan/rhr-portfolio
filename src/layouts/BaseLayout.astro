@@ -70,10 +70,9 @@ const ogImage = new URL(image, Astro.site);
   </head>
   <body class="relative isolate flex min-h-dvh flex-col font-sans">
     <!-- Latar pola titik (Magic UI), memudar dari atas -->
-    <div class="pointer-events-none fixed inset-0 -z-10" aria-hidden="true">
+    <div class="pointer-events-none fixed inset-0 -z-10" aria-hidden="true" transition:persist="dot-pattern">
       <DotPattern
         client:idle
-        transition:persist="dot-pattern"
         width={22}
         height={22}
         cr={1}

@@ -1,5 +1,6 @@
 ---
-import ThemeToggle from './ThemeToggle.astro';
+import ThemeToggler from './islands/ThemeToggler';
+import { ScrollProgress } from '@/components/ui/scroll-progress';
 import { NAV_SECTION_IDS, SECTIONS } from '../consts';
 import { getLang, localePath, switchPath, t } from '../i18n';
 
@@ -10,13 +11,17 @@ const onProjectsPage = Astro.url.pathname.startsWith(localePath(lang, '/projects
 const other = lang === 'en' ? 'id' : 'en';
 ---
 
-<header class="sticky top-0 z-40 border-b border-line bg-canvas/85 backdrop-blur-md">
-  <nav class="mx-auto flex h-14 w-full max-w-6xl items-center gap-4 px-4 sm:px-6" aria-label={tr.nav.label}>
-    <a href={localePath(lang, '/')} class="font-mono text-sm font-medium">
-      <span class="text-accent" aria-hidden="true">❯</span> royan.dev
+<ScrollProgress client:load className="z-50 h-0.5 bg-linear-to-r from-accent-from to-accent-to" />
+<header class="sticky top-3 z-40 px-3 sm:top-4 sm:px-4">
+  <nav
+    class="mx-auto flex h-14 w-full max-w-5xl items-center gap-3 rounded-full border border-line bg-surface/70 pr-2 pl-5 shadow-(--shadow-sheet) backdrop-blur-md"
+    aria-label={tr.nav.label}
+  >
+    <a href={localePath(lang, '/')} class="font-mono text-sm font-semibold tracking-tight">
+      royan<span class="bg-linear-to-r from-accent-from to-accent-to bg-clip-text text-transparent">.dev</span>
     </a>
 
-    <ul class="ml-auto hidden items-center gap-1 lg:flex">
+    <ul class="ml-auto hidden items-center gap-0.5 lg:flex">
       {
         links.map(({ id, label }) => (
           <li>
@@ -24,7 +29,7 @@ const other = lang === 'en' ? 'id' : 'en';
               href={localePath(lang, `/#${id}`)}
               data-nav-link={id}
               aria-current={id === 'projects' && onProjectsPage ? 'page' : undefined}
-              class="rounded-md px-3 py-1.5 text-sm text-muted transition-colors hover:text-ink aria-[current]:text-accent"
+              class="rounded-full px-3 py-1.5 text-sm text-muted transition-colors hover:text-ink aria-[current]:bg-surface-2 aria-[current]:text-ink"
             >
               {label}
             </a>
@@ -33,19 +38,19 @@ const other = lang === 'en' ? 'id' : 'en';
       }
     </ul>
 
-    <div class="ml-auto flex items-center gap-1 lg:ml-2">
+    <div class="ml-auto flex items-center gap-1 lg:ml-1">
       <button
         type="button"
         data-cmdk-open
-        class="flex items-center gap-2 rounded-md border border-line px-2.5 py-1.5 text-sm text-muted transition-colors hover:border-muted hover:text-ink"
+        class="flex h-9 items-center gap-2 rounded-full border border-line px-3 text-sm text-muted transition-colors hover:border-muted hover:text-ink"
       >
         <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
           <circle cx="11" cy="11" r="7"></circle>
           <path d="m20 20-3.5-3.5"></path>
         </svg>
         <span class="lg:hidden">{tr.nav.menu}</span>
-        <span class="hidden lg:inline">{tr.nav.search}</span>
-        <kbd class="hidden rounded border border-line px-1.5 font-mono text-[11px] lg:inline">Ctrl K</kbd>
+        <span class="hidden xl:inline">{tr.nav.search}</span>
+        <kbd class="hidden rounded border border-line px-1.5 font-mono text-[11px] xl:inline">Ctrl K</kbd>
       </button>
       <a
         href={switchPath(Astro.url.pathname, other)}
@@ -54,47 +59,17 @@ const other = lang === 'en' ? 'id' : 'en';
         data-lang-switch
         aria-label={tr.nav.switchLang}
         title={tr.nav.switchLang}
-        class="rounded-md px-2 py-1.5 font-mono text-xs font-semibold text-muted transition-colors hover:bg-surface-2 hover:text-ink"
+        class="grid h-9 place-items-center rounded-full px-2.5 font-mono text-xs font-semibold text-muted transition-colors hover:bg-surface-2 hover:text-ink"
       >
-        <span class:list={[lang === 'id' && 'text-ink']}>ID</span><span class="px-0.5 opacity-40" aria-hidden="true">/</span><span class:list={[lang === 'en' && 'text-ink']}>EN</span>
+        <span><span class:list={[lang === 'id' && 'text-ink']}>ID</span><span class="px-0.5 opacity-40" aria-hidden="true">/</span><span class:list={[lang === 'en' && 'text-ink']}>EN</span></span>
       </a>
-      <ThemeToggle />
+      <ThemeToggler client:load label={tr.nav.theme} />
     </div>
   </nav>
-  <div
-    class="absolute inset-x-0 -bottom-px h-px origin-left bg-accent"
-    style="transform: scaleX(var(--scroll, 0))"
-    aria-hidden="true"
-  >
-  </div>
 </header>
 
 <script>
   import { onPageLoad } from '../scripts/lifecycle';
-
-  // Scroll progress bar
-  onPageLoad(() => {
-    const root = document.documentElement;
-    let ticking = false;
-    const update = () => {
-      ticking = false;
-      const max = root.scrollHeight - window.innerHeight;
-      root.style.setProperty('--scroll', max > 0 ? (window.scrollY / max).toFixed(4) : '0');
-    };
-    const onScroll = () => {
-      if (!ticking) {
-        ticking = true;
-        requestAnimationFrame(update);
-      }
-    };
-    update();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', onScroll);
-    return () => {
-      window.removeEventListener('scroll', onScroll);
-      window.removeEventListener('resize', onScroll);
-    };
-  });
 
   // Tombol ID/EN membawa posisi section yang sedang dibuka (#hash) ke halaman bahasa lain.
   // Fase capture supaya href sudah diperbarui sebelum ClientRouter membaca klik.

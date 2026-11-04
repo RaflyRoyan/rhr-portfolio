@@ -539,7 +539,6 @@ svg[id^='mermaid'] .edgeLabel rect {
   opacity: 1;
 }
 
-
 @media (prefers-reduced-motion: reduce) {
   .js .ink-word {
     opacity: 1;
@@ -560,4 +559,12 @@ html:not(.js) .blur-fade {
     filter: none !important;
     transform: none !important;
   }
+}
+
+/* Transisi tema (animated-theme-toggler): matikan crossfade bawaan hanya saat toggle,
+   supaya transisi halaman ClientRouter tetap jalan */
+html[data-magicui-theme-vt='active']::view-transition-old(root),
+html[data-magicui-theme-vt='active']::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
 }
