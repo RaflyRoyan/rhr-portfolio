@@ -1,6 +1,10 @@
 ---
-import CodeCard from './CodeCard.astro';
-import Doodle from '../Doodle.astro';
+import { AnimatedGridPattern } from '@/components/ui/animated-grid-pattern';
+import Reveal from '../islands/Reveal';
+import RoleRotate from '../islands/RoleRotate';
+import Ticker from '../islands/Ticker';
+import HeroTerminal from '../islands/HeroTerminal';
+import ShimmerLink from '../ShimmerLink.astro';
 import { getLang, getProfile, t } from '../../i18n';
 
 interface Props {
@@ -13,213 +17,91 @@ const tr = t(lang).hero;
 const profile = getProfile(lang);
 const words = profile.name.split(' ');
 const nameLines = [words.slice(0, 2).join(' '), words.slice(2).join(' ')].filter(Boolean);
-const skills = Object.values(profile.skills).flat();
-const button =
-  'rounded-full px-6 py-3 text-sm font-semibold transition-[translate,background-color,border-color,color] duration-300 hover:-translate-y-0.5 active:translate-y-0';
+const topSkills = Object.values(profile.skills).flat().slice(0, 4);
+const terminalLines = [
+  { command: tr.terminalCmd.whoami, output: profile.name },
+  { command: tr.terminalCmd.role, output: `${profile.title}, ${profile.tagline}` },
+  { command: tr.terminalCmd.where, output: profile.location },
+  { command: tr.terminalCmd.stack, output: topSkills.join('  ') },
+];
 ---
 
-<section id="top" class="relative">
-  <div class="relative mx-auto w-full max-w-6xl px-4 pt-12 pb-20 sm:px-6 sm:pt-16 lg:pt-20 lg:pb-28">
-    <div class="flex flex-wrap items-center justify-between gap-4">
-      <p class="inline-flex items-center gap-2 rounded-full border border-line bg-surface px-3.5 py-1.5 text-xs font-semibold shadow-(--shadow-sheet) sm:text-sm">
-        <span class="relative flex size-2">
-          <span class="absolute inline-flex size-full animate-ping rounded-full bg-accent opacity-60 motion-reduce:hidden"></span>
-          <span class="relative inline-flex size-2 rounded-full bg-accent"></span>
-        </span>
-        {profile.currentPosition}
-      </p>
-      <p class="font-mono text-xs text-muted sm:text-sm">{profile.location}</p>
-    </div>
+<section id="top" class="relative isolate overflow-hidden">
+  <AnimatedGridPattern
+    client:load
+    numSquares={28}
+    maxOpacity={0.12}
+    duration={3}
+    width={48}
+    height={48}
+    className="-z-10 fill-accent/30 stroke-line/70 [mask-image:radial-gradient(640px_circle_at_70%_30%,white,transparent)] inset-x-0 inset-y-[-20%] h-[140%]"
+  />
 
-    <!-- Nama besar selebar halaman -->
-    <div class="relative mt-10 sm:mt-14">
-      <p class="hand absolute -top-8 left-1 -rotate-3 text-xl sm:-top-9 sm:text-2xl" aria-hidden="true" data-depth="0.12">{tr.hello}</p>
-      <h1 class="text-[clamp(3.1rem,11.5vw,9.5rem)] leading-[0.88] font-extrabold tracking-[-0.045em]" data-depth="-0.05">
-        {
-          nameLines.map((line, i) =>
-            i === nameLines.length - 1 ? (
-              <span class="block">
-                <span class="highlight" data-draw style="--draw-delay: 0.35s">{line}</span>
-              </span>
-            ) : (
-              <span class="block">{line}</span>
-            ),
-          )
-        }
-      </h1>
-      <Doodle name="star" class="bob absolute top-2 right-0 hidden size-16 text-amber-400 [--bob-rot:10deg] md:block lg:size-24" stroke={4} delay={1} depth={0.35} />
-      <Doodle name="sparkle" class="bob absolute right-28 bottom-4 hidden size-10 text-pen [--bob-delay:1.2s] lg:block" stroke={5} delay={1.3} depth={0.22} />
-    </div>
+  <div class="mx-auto w-full max-w-6xl px-4 pt-16 pb-24 sm:px-6 sm:pt-20 lg:pt-24 lg:pb-32">
+    <Reveal client:load delay={0.05}>
+      <div class="flex flex-wrap items-center justify-between gap-4">
+        <p class="inline-flex items-center gap-2 rounded-full border border-line bg-surface/80 px-3.5 py-1.5 text-xs font-medium backdrop-blur sm:text-sm">
+          <span class="relative flex size-2">
+            <span class="absolute inline-flex size-full animate-ping rounded-full bg-accent opacity-60 motion-reduce:hidden"></span>
+            <span class="relative inline-flex size-2 rounded-full bg-accent"></span>
+          </span>
+          {profile.currentPosition}
+        </p>
+        <p class="font-mono text-xs text-muted sm:text-sm">{profile.location}</p>
+      </div>
+    </Reveal>
 
-    <div class="mt-14 grid gap-12 lg:mt-16 lg:grid-cols-12 lg:gap-10">
-      <div class="lg:col-span-5">
-        <p class="text-xl font-bold sm:text-2xl">{profile.title}, {profile.tagline}</p>
-        <p class="mt-4 text-[1.0625rem] leading-7 text-muted">{profile.bio.short}</p>
-        <div class="mt-8 flex flex-wrap items-center gap-4">
-          <a href="#projects" class:list={[button, 'bg-ink text-canvas hover:bg-pen']}>{tr.viewProjects}</a>
-          <a href="#contact" class:list={[button, 'border border-ink/25 hover:border-ink']}>{tr.contact}</a>
-        </div>
+    <div class="mt-12 grid gap-14 lg:mt-16 lg:grid-cols-12 lg:gap-10">
+      <div class="lg:col-span-7">
+        <Reveal client:load delay={0.12}>
+          <h1 class="text-[clamp(2.9rem,8.5vw,6.5rem)] leading-[0.92] font-extrabold tracking-[-0.045em]">
+            {
+              nameLines.map((line, i) =>
+                i === nameLines.length - 1 ? (
+                  <span class="block bg-linear-to-r from-accent-from to-accent-to bg-clip-text pb-1 text-transparent">{line}</span>
+                ) : (
+                  <span class="block">{line}</span>
+                ),
+              )
+            }
+          </h1>
+        </Reveal>
+
+        <Reveal client:load delay={0.2}>
+          <p class="mt-6 flex flex-wrap items-baseline gap-x-2 text-xl font-semibold sm:text-2xl">
+            <RoleRotate client:load words={tr.roles} className="inline-block text-ink" />
+            <span class="text-muted">· {profile.tagline}</span>
+          </p>
+          <p class="mt-4 max-w-xl text-[1.0625rem] leading-7 text-muted">{profile.bio.short}</p>
+        </Reveal>
+
+        <Reveal client:load delay={0.28}>
+          <div class="mt-8 flex flex-wrap items-center gap-3">
+            <ShimmerLink href="#projects">{tr.viewProjects}</ShimmerLink>
+            <a
+              href="#contact"
+              class="rounded-full border border-line bg-surface/70 px-6 py-3 text-sm font-semibold backdrop-blur transition-[translate,border-color] duration-300 hover:-translate-y-0.5 hover:border-muted"
+            >
+              {tr.contact}
+            </a>
+          </div>
+        </Reveal>
+
+        <ul class="mt-12 grid max-w-lg grid-cols-3 gap-4" aria-label={tr.summary}>
+          {
+            stats.map(({ value, label }) => (
+              <li class="rounded-2xl border border-line bg-surface/70 p-4 backdrop-blur">
+                <Ticker client:visible value={value} className="block text-3xl font-bold tracking-tight tabular-nums sm:text-4xl" />
+                <span class="mt-1 block text-xs text-muted sm:text-sm">{label}</span>
+              </li>
+            ))
+          }
+        </ul>
       </div>
 
-      <ul class="grid grid-cols-3 gap-4 self-start lg:col-span-2 lg:grid-cols-1 lg:gap-6" aria-label={tr.summary}>
-        {
-          stats.map(({ value, label }, i) => (
-            <li class="relative border-t-2 border-dashed border-line pt-3">
-              <span class="hand block text-5xl leading-none font-bold tabular-nums" data-count={value}>
-                {value}
-              </span>
-              <span class="mt-1 block text-sm text-muted">{label}</span>
-              {i === 0 && (
-                <Doodle name="circle" class="absolute top-0 -left-3 h-16 w-20 text-pen/60" stroke={2.5} delay={1.6} />
-              )}
-            </li>
-          ))
-        }
-      </ul>
-
-      <div class="relative lg:col-span-5">
-        <div class="pointer-events-none absolute -top-12 right-4 flex items-end gap-1" aria-hidden="true" data-depth="0.18">
-          <span class="hand inline-block -rotate-3 text-lg">{tr.codeNote}</span>
-          <Doodle name="arrow-down" class="h-10 w-7" delay={1.2} />
-        </div>
-        <Doodle name="db" class="bob absolute -bottom-10 -left-6 z-10 size-16 text-pen" delay={0.9} depth={0.3} />
-        <Doodle name="braces" class="bob absolute -right-5 -bottom-8 z-10 size-14 text-accent [--bob-delay:1.5s]" delay={1.1} depth={0.42} />
-        <div class="rotate-[1deg] transition-[rotate] duration-500 hover:rotate-0" data-depth="0.1">
-          <CodeCard />
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Pita teknologi berjalan -->
-  <div class="relative bg-ink py-4 text-canvas">
-    <div class="overflow-hidden" data-marquee-band>
-      <div class="marquee">
-        {
-          [0, 1].map((copy) => (
-            <ul class="flex shrink-0 items-center" aria-hidden={copy === 1 ? 'true' : undefined} aria-label={copy === 0 ? tr.tech : undefined}>
-              {skills.map((skill) => (
-                <li class="flex items-center gap-6 pr-6 text-lg font-bold whitespace-nowrap sm:text-xl">
-                  {skill}
-                  <span class="text-hl" aria-hidden="true">✳</span>
-                </li>
-              ))}
-            </ul>
-          ))
-        }
+      <div class="lg:col-span-5 lg:pt-6">
+        <HeroTerminal client:visible title={tr.terminalTitle} lines={terminalLines} />
       </div>
     </div>
   </div>
 </section>
-
-<script>
-  import { onPageLoad, prefersReducedMotion } from '../../scripts/lifecycle';
-
-  // Counter beranimasi dari 0 saat masuk viewport
-  onPageLoad(() => {
-    const counters = [...document.querySelectorAll<HTMLElement>('[data-count]')];
-    if (counters.length === 0 || prefersReducedMotion()) return;
-    const frames = new Set<number>();
-
-    const run = (el: HTMLElement) => {
-      const target = Number(el.dataset.count);
-      const start = performance.now();
-      const duration = 1000;
-      const tick = (now: number) => {
-        const t = Math.min((now - start) / duration, 1);
-        el.textContent = String(Math.round(target * (1 - Math.pow(1 - t, 3))));
-        if (t < 1) frames.add(requestAnimationFrame(tick));
-      };
-      frames.add(requestAnimationFrame(tick));
-    };
-
-    counters.forEach((el) => (el.textContent = '0'));
-    const io = new IntersectionObserver((entries) => {
-      for (const entry of entries) {
-        if (!entry.isIntersecting) continue;
-        run(entry.target as HTMLElement);
-        io.unobserve(entry.target);
-      }
-    });
-    counters.forEach((el) => io.observe(el));
-    return () => {
-      io.disconnect();
-      frames.forEach(cancelAnimationFrame);
-    };
-  });
-
-  // Kedalaman hero: tiap lapisan [data-depth] bergeser beda kecepatan saat scroll dan mengikuti kursor.
-  // Pita teknologi bereaksi ke kecepatan scroll: makin cepat, berbalik arah saat scroll ke atas.
-  // Memakai properti `translate` supaya tidak bentrok dengan animasi `transform` (.bob, .marquee).
-  onPageLoad(() => {
-    const hero = document.getElementById('top');
-    if (!hero || prefersReducedMotion()) return;
-    const layers = [...hero.querySelectorAll<HTMLElement | SVGElement>('[data-depth]')].map((el) => ({
-      el,
-      depth: Number(el.dataset.depth),
-    }));
-    const band = hero.querySelector<HTMLElement>('[data-marquee-band]');
-    const marquee = band?.querySelector<HTMLElement>('.marquee')?.getAnimations()[0];
-    const finePointer = window.matchMedia('(pointer: fine) and (min-width: 1024px)').matches;
-
-    let pointerX = 0;
-    let pointerY = 0;
-    let curX = 0;
-    let curY = 0;
-    let lastY = window.scrollY;
-    let lastT = performance.now();
-    let velocity = 0;
-    let rate = 1;
-    let frame = 0;
-
-    const tick = () => {
-      frame = 0;
-      const now = performance.now();
-      const y = window.scrollY;
-      const dt = Math.max(now - lastT, 1);
-      velocity += ((y - lastY) / dt - velocity) * 0.25;
-      lastY = y;
-      lastT = now;
-
-      curX += (pointerX - curX) * 0.08;
-      curY += (pointerY - curY) * 0.08;
-      if (y < hero.offsetHeight) {
-        for (const { el, depth } of layers) {
-          el.style.translate = `${(-curX * depth * 70).toFixed(2)}px ${(-y * depth - curY * depth * 50).toFixed(2)}px`;
-        }
-      }
-
-      const targetRate = 1 + Math.max(-4, Math.min(5, velocity * 2.2));
-      rate += (targetRate - rate) * 0.12;
-      if (marquee) marquee.playbackRate = rate;
-      if (band) band.style.transform = `skewX(${Math.max(-8, Math.min(8, -velocity * 3)).toFixed(2)}deg)`;
-
-      const settled = Math.abs(velocity) < 0.002 && Math.abs(rate - 1) < 0.01 && Math.abs(pointerX - curX) < 0.001 && Math.abs(pointerY - curY) < 0.001;
-      if (settled) {
-        velocity = 0;
-        if (marquee) marquee.playbackRate = 1;
-        if (band) band.style.transform = '';
-      } else frame = requestAnimationFrame(tick);
-    };
-    const wake = () => {
-      if (!frame) {
-        lastT = performance.now();
-        frame = requestAnimationFrame(tick);
-      }
-    };
-    const onPointer = (e: PointerEvent) => {
-      pointerX = e.clientX / window.innerWidth - 0.5;
-      pointerY = e.clientY / window.innerHeight - 0.5;
-      wake();
-    };
-
-    window.addEventListener('scroll', wake, { passive: true });
-    if (finePointer) window.addEventListener('pointermove', onPointer, { passive: true });
-    wake();
-    return () => {
-      cancelAnimationFrame(frame);
-      window.removeEventListener('scroll', wake);
-      window.removeEventListener('pointermove', onPointer);
-    };
-  });
-</script>

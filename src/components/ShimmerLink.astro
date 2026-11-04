@@ -1,0 +1,32 @@
+---
+// Varian <a> dari ShimmerButton Magic UI (registry hanya menyediakan <button>).
+// Murni CSS (animate-shimmer-slide & animate-spin-around dari global.css), tanpa JS.
+interface Props {
+  href: string;
+  class?: string;
+  external?: boolean;
+}
+
+const { href, class: className, external } = Astro.props;
+---
+
+<a
+  href={href}
+  target={external ? '_blank' : undefined}
+  rel={external ? 'noopener noreferrer' : undefined}
+  style="--spread: 90deg; --shimmer-color: #ffffff; --radius: 9999px; --speed: 3s; --cut: 0.08em; --bg: linear-gradient(135deg, var(--accent-from), color-mix(in oklab, var(--accent-from) 55%, var(--accent-to)))"
+  class:list={[
+    'group relative z-0 inline-flex cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-(--radius) border border-white/10 px-6 py-3 text-sm font-semibold whitespace-nowrap text-white [background:var(--bg)]',
+    'transform-gpu transition-transform duration-300 ease-in-out hover:-translate-y-0.5 active:translate-y-px',
+    className,
+  ]}
+>
+  <span class="@container-[size] absolute inset-0 -z-30 overflow-visible blur-[2px]" aria-hidden="true">
+    <span class="animate-shimmer-slide absolute inset-0 aspect-square h-[100cqh] rounded-none motion-reduce:animate-none">
+      <span class="animate-spin-around absolute -inset-full w-auto rotate-0 [background:conic-gradient(from_calc(270deg-(var(--spread)*0.5)),transparent_0,var(--shimmer-color)_var(--spread),transparent_var(--spread))] [translate:0_0] motion-reduce:animate-none"></span>
+    </span>
+  </span>
+  <slot />
+  <span class="absolute inset-0 size-full rounded-(--radius) shadow-[inset_0_-8px_10px_#ffffff1f] transition-all duration-300 group-hover:shadow-[inset_0_-6px_10px_#ffffff3f]" aria-hidden="true"></span>
+  <span class="absolute inset-(--cut) -z-20 rounded-(--radius) [background:var(--bg)]" aria-hidden="true"></span>
+</a>
